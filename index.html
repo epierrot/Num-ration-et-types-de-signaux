@@ -1,0 +1,2036 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Transmission des Données</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+/* ===== DESIGN TOKENS ===== */
+/* Layout: sidebar nav + scrollable content panels, full-screen immersive */
+:root {
+  --bg:        #07091a;
+  --bg-panel:  #0d1030;
+  --bg-card:   #121535;
+  --bg-ele:    #1a1f4a;
+  --border:    #2a3070;
+  --fg:        #e8ecff;
+  --fg-muted:  #7a85b8;
+  --accent:    #00cfff;
+  --accent2:   #7b5cff;
+  --accent3:   #00ff99;
+  --warn:      #ffb300;
+  --danger:    #ff4f6b;
+  --success:   #00e5a0;
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg:        #f0f4ff;
+  --bg-panel:  #e4eaff;
+  --bg-card:   #fff;
+  --bg-ele:    #dde5ff;
+  --border:    #bdc8f0;
+  --fg:        #0d1030;
+  --fg-muted:  #4a5280;
+  --accent:    #0070cc;
+  --accent2:   #5b3dcc;
+  --accent3:   #00885a;
+  --warn:      #c07a00;
+  --danger:    #cc2244;
+  --success:   #008858;
+  color-scheme: light;
+}}
+:root[data-theme="light"] {
+  --bg:        #f0f4ff;
+  --bg-panel:  #e4eaff;
+  --bg-card:   #fff;
+  --bg-ele:    #dde5ff;
+  --border:    #bdc8f0;
+  --fg:        #0d1030;
+  --fg-muted:  #4a5280;
+  --accent:    #0070cc;
+  --accent2:   #5b3dcc;
+  --accent3:   #00885a;
+  --warn:      #c07a00;
+  --danger:    #cc2244;
+  --success:   #008858;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  display: flex;
+  flex-direction: column;
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+
+/* ===== HEADER ===== */
+.site-header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 max(16px, env(safe-area-inset-left, 0px)) 0 max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 50;
+  flex-shrink: 0;
+}
+.site-header h1 {
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.site-header .badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+.progress-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--border);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.theme-btn {
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  color: var(--fg-muted);
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.theme-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ===== LAYOUT ===== */
+.layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sidebar-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 8px 16px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  text-decoration: none;
+}
+.nav-item:hover { color: var(--fg); background: var(--bg-ele); }
+.nav-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(0,207,255,0.07);
+}
+.nav-item .num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+  min-width: 20px;
+}
+.nav-item.active .num { color: var(--accent); }
+.nav-item .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.nav-item.done .dot { background: var(--success); }
+.nav-item.active .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+/* ===== CONTENT ===== */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  scroll-behavior: smooth;
+  min-width: 0;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  display: none;
+  padding: 36px max(24px, env(safe-area-inset-right, 0px)) 60px max(24px, env(safe-area-inset-left, 0px));
+  max-width: 820px;
+  animation: fadeIn 0.3s ease;
+}
+.section.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.section-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: rgba(0,207,255,0.1);
+  border: 1px solid rgba(0,207,255,0.3);
+  padding: 4px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.05em;
+}
+.section-title {
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card p { color: var(--fg-muted); line-height: 1.7; }
+.card p strong { color: var(--fg); }
+.card p + p { margin-top: 10px; }
+
+.definition {
+  background: rgba(0,207,255,0.05);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 0.9rem;
+  color: var(--fg);
+}
+.definition strong { color: var(--accent); }
+
+.info-box {
+  background: rgba(123,92,255,0.07);
+  border: 1px solid rgba(123,92,255,0.25);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 0.88rem;
+  color: var(--fg-muted);
+}
+.info-box strong { color: var(--accent2); }
+
+/* ===== BINARY DISPLAY ===== */
+.bit-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: var(--font-mono);
+}
+.bit-cell {
+  width: 38px; height: 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--bg-ele);
+  color: var(--fg);
+  transition: all 0.2s;
+  cursor: default;
+  position: relative;
+}
+.bit-cell.one { background: rgba(0,207,255,0.15); border-color: rgba(0,207,255,0.5); color: var(--accent); }
+.bit-cell.msb { border-top: 2px solid var(--accent2); }
+.bit-cell.lsb { border-top: 2px solid var(--warn); }
+.bit-label {
+  font-size: 0.6rem;
+  color: var(--fg-muted);
+  position: absolute;
+  top: -16px;
+  font-family: var(--font-mono);
+}
+.bit-sep {
+  width: 8px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--border);
+  font-size: 0.8rem;
+}
+
+/* ===== MASK DEMO ===== */
+.mask-demo {
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+}
+.mask-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+.mask-label { width: 70px; color: var(--fg-muted); font-size: 0.8rem; }
+.mask-bits {
+  display: flex;
+  gap: 3px;
+}
+.mask-bit {
+  width: 30px; height: 30px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.4s;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.mask-bit.on { background: rgba(0,207,255,0.2); border-color: var(--accent); color: var(--accent); }
+.mask-bit.off { background: var(--bg-ele); color: var(--fg-muted); }
+.mask-bit.res-on { background: rgba(0,255,153,0.2); border-color: var(--success); color: var(--success); }
+.mask-bit.res-off { background: var(--bg-card); color: var(--fg-muted); }
+.mask-sep { height: 1px; background: var(--border); margin: 8px 0; }
+.mask-op { color: var(--accent2); font-size: 0.75rem; margin-left: 70px; margin-bottom: 6px; }
+
+/* ===== TRANSMISSION ANIMATION ===== */
+.transmission-demo {
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+}
+.tx-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+}
+.tx-vis {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 20px;
+  position: relative;
+}
+.tx-node {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+.tx-node.emit { border-color: var(--accent); color: var(--accent); }
+.tx-node.recv { border-color: var(--accent2); color: var(--accent2); }
+.tx-wires {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 10px;
+  min-width: 0;
+  overflow: hidden;
+}
+.tx-wire {
+  height: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  position: relative;
+  overflow: hidden;
+}
+.tx-packet {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  height: 10px; width: 24px;
+  border-radius: 100px;
+  opacity: 0;
+}
+.tx-packet.p1 { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.tx-packet.p2 { background: var(--accent2); }
+.tx-packet.p3 { background: var(--accent3); }
+
+.tx-btn {
+  background: rgba(0,207,255,0.1);
+  border: 1px solid rgba(0,207,255,0.3);
+  border-radius: 8px;
+  padding: 8px 18px;
+  color: var(--accent);
+  font-family: var(--font-head);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.tx-btn:hover { background: rgba(0,207,255,0.2); border-color: var(--accent); }
+
+/* ===== DUPLEX DEMO ===== */
+.duplex-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 16px 0;
+}
+.duplex-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.duplex-card:hover, .duplex-card.active {
+  border-color: var(--accent);
+  background: rgba(0,207,255,0.05);
+}
+.duplex-card.active { box-shadow: 0 0 0 1px var(--accent); }
+.duplex-card-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.duplex-card.hd .duplex-card-title { color: var(--warn); }
+.duplex-card.fd .duplex-card-title { color: var(--success); }
+.duplex-card.sx .duplex-card-title { color: var(--accent2); }
+.duplex-desc { font-size: 0.75rem; color: var(--fg-muted); line-height: 1.5; }
+
+.duplex-vis {
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.d-node {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  min-width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.d-channel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+.d-arrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+}
+.d-arrow-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+  border-radius: 1px;
+}
+.d-arrow-fill {
+  height: 100%;
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%;
+  border-radius: 1px;
+}
+.d-arrow-fill.blue { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.d-arrow-fill.purple { background: var(--accent2); }
+.d-arrow-head { flex-shrink: 0; }
+
+/* ===== ASYNC/SYNC FRAME ===== */
+.frame-vis {
+  display: flex;
+  gap: 2px;
+  align-items: stretch;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  overflow-x: auto;
+}
+.frame-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  min-width: 50px;
+  background: var(--bg-ele);
+  flex-shrink: 0;
+}
+.frame-field.start { background: rgba(0,255,153,0.1); border-color: var(--success); color: var(--success); }
+.frame-field.data  { background: rgba(0,207,255,0.08); border-color: var(--accent); color: var(--accent); min-width: 140px; }
+.frame-field.parity { background: rgba(255,179,0,0.1); border-color: var(--warn); color: var(--warn); }
+.frame-field.stop  { background: rgba(255,79,107,0.1); border-color: var(--danger); color: var(--danger); }
+.frame-field-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.7; margin-bottom: 4px; }
+.frame-field-val   { font-weight: 700; font-size: 0.85rem; }
+
+/* ===== CAN / ETHERNET FRAMES ===== */
+.can-frame, .eth-frame {
+  display: flex;
+  gap: 2px;
+  margin: 16px 0;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.can-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-ele);
+  min-width: 60px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.can-field:hover { border-color: var(--accent); background: rgba(0,207,255,0.05); }
+.can-field.selected { border-color: var(--accent); background: rgba(0,207,255,0.1); }
+.can-field-name { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600; color: var(--fg-muted); }
+.can-field-size { font-size: 0.6rem; color: var(--fg-muted); opacity: 0.7; margin-top: 2px; }
+.can-field.sof   .can-field-name { color: var(--success); }
+.can-field.id    .can-field-name { color: var(--accent); }
+.can-field.ctrl  .can-field-name { color: var(--warn); }
+.can-field.crc   .can-field-name { color: var(--danger); }
+.can-field.ack   .can-field-name { color: var(--accent2); }
+.can-field.eof   .can-field-name { color: var(--fg); }
+
+.can-tooltip {
+  background: var(--bg-panel);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-top: 10px;
+  font-size: 0.84rem;
+  color: var(--fg);
+  display: none;
+}
+.can-tooltip.show { display: block; animation: fadeIn 0.2s ease; }
+.can-tooltip strong { color: var(--accent); }
+
+/* ===== ETHERNET FRAME ===== */
+.eth-row {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.eth-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-ele);
+  min-width: 70px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.eth-block:hover, .eth-block.sel { border-color: var(--accent2); background: rgba(123,92,255,0.08); }
+.eth-name { font-family: var(--font-mono); font-size: 0.65rem; font-weight: 600; color: var(--fg-muted); text-align: center; }
+.eth-bytes { font-size: 0.58rem; color: var(--fg-muted); opacity: 0.7; margin-top: 3px; }
+.eth-block.pream .eth-name { color: var(--accent); }
+.eth-block.dst   .eth-name { color: var(--warn); }
+.eth-block.src   .eth-name { color: var(--accent3); }
+.eth-block.etype .eth-name { color: var(--accent2); }
+.eth-block.data  .eth-name { color: var(--fg); min-width: 110px; }
+.eth-block.crc   .eth-name { color: var(--danger); }
+
+/* ===== QUIZ ===== */
+.quiz-question {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+}
+.quiz-q-text {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--fg);
+  line-height: 1.5;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  background: var(--bg-ele);
+  color: var(--fg);
+}
+.quiz-option:hover { border-color: var(--accent); background: rgba(0,207,255,0.05); }
+.quiz-option.correct { border-color: var(--success); background: rgba(0,255,153,0.08); color: var(--success); }
+.quiz-option.wrong { border-color: var(--danger); background: rgba(255,79,107,0.07); color: var(--danger); }
+.quiz-option-key {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.quiz-fb {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border-radius: 7px;
+  display: none;
+}
+.quiz-fb.correct { background: rgba(0,255,153,0.08); color: var(--success); display: block; }
+.quiz-fb.wrong   { background: rgba(255,79,107,0.07); color: var(--danger); display: block; }
+
+/* ===== SCORE ===== */
+.score-display {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  margin: 24px 0;
+  display: none;
+}
+.score-num {
+  font-family: var(--font-head);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.score-label { color: var(--fg-muted); font-size: 0.9rem; margin-top: 6px; }
+.score-msg { margin-top: 16px; font-size: 0.95rem; }
+
+/* ===== NAV BUTTONS ===== */
+.section-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.nav-btn {
+  padding: 10px 20px;
+  border-radius: 9px;
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--bg-ele);
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.nav-btn.primary {
+  background: rgba(0,207,255,0.12);
+  border-color: rgba(0,207,255,0.4);
+  color: var(--accent);
+}
+.nav-btn.primary:hover { background: rgba(0,207,255,0.2); }
+.nav-btn.ml { margin-left: auto; }
+
+/* ===== INTRO HERO ===== */
+.hero {
+  background: linear-gradient(135deg, rgba(0,207,255,0.05) 0%, rgba(123,92,255,0.05) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(0,207,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.hero-title {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  text-wrap: balance;
+}
+.hero-sub {
+  color: var(--fg-muted);
+  font-size: 0.95rem;
+  max-width: 540px;
+  line-height: 1.65;
+}
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.hero-chip {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid;
+}
+.hero-chip.c1 { color: var(--accent); border-color: rgba(0,207,255,0.3); background: rgba(0,207,255,0.07); }
+.hero-chip.c2 { color: var(--accent2); border-color: rgba(123,92,255,0.3); background: rgba(123,92,255,0.07); }
+.hero-chip.c3 { color: var(--success); border-color: rgba(0,255,153,0.3); background: rgba(0,255,153,0.07); }
+.hero-chip.c4 { color: var(--warn); border-color: rgba(255,179,0,0.3); background: rgba(255,179,0,0.07); }
+
+/* ===== PLAN TABLE ===== */
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.plan-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+  font-weight: 500;
+}
+.plan-item:hover { border-color: var(--accent); color: var(--fg); }
+.plan-num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); min-width: 20px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 680px) {
+  .sidebar { width: 56px; }
+  .nav-item span { display: none; }
+  .nav-item .num { display: none; }
+  .duplex-cards { grid-template-columns: 1fr; }
+  .plan-grid { grid-template-columns: 1fr; }
+  .section-title { font-size: 1.3rem; }
+  .hero-title { font-size: 1.5rem; }
+}
+@media (max-width: 480px) {
+  .sidebar { display: none; }
+  .section { padding: 20px 16px 48px; }
+}
+
+/* ===== SCROLLBAR ===== */
+.content::-webkit-scrollbar, .sidebar::-webkit-scrollbar { width: 5px; }
+.content::-webkit-scrollbar-track, .sidebar::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb, .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes flow {
+  0%   { left: -20%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: 110%; opacity: 0; }
+}
+@keyframes flowrev {
+  0%   { right: -20%; left: auto; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { right: 110%; left: auto; opacity: 0; }
+}
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+h3 {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  color: var(--fg);
+}
+h4 {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 18px 0 8px;
+  color: var(--fg-muted);
+  letter-spacing: 0.01em;
+}
+p { margin-bottom: 12px; color: var(--fg-muted); }
+p:last-child { margin-bottom: 0; }
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+  vertical-align: middle;
+}
+.tag-b { background: rgba(0,207,255,0.15); color: var(--accent); }
+.tag-p { background: rgba(123,92,255,0.15); color: var(--accent2); }
+
+/* Interactive bit converter */
+.converter {
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+}
+.converter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.converter input[type=number] {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  width: 90px;
+  transition: border-color 0.2s;
+}
+.converter input[type=number]:focus { outline: none; border-color: var(--accent); }
+.converter-eq { color: var(--fg-muted); font-size: 0.85rem; }
+.convert-bits {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.c-bit {
+  width: 36px; height: 36px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1rem;
+  border: 1.5px solid var(--border);
+  transition: all 0.25s;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-card);
+  color: var(--fg-muted);
+}
+.c-bit.one { background: rgba(0,207,255,0.15); border-color: var(--accent); color: var(--accent); }
+.c-bit.zero { background: var(--bg-ele); }
+.convert-hex { font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent2); font-weight: 600; }
+.convert-dec { font-family: var(--font-mono); font-size: 1.1rem; color: var(--warn); font-weight: 600; }
+</style>
+
+<div class="site-header">
+  <h1>⚡ Transmission des Données</h1>
+  <span class="badge">1ère Spé SI</span>
+  <button class="theme-btn" onclick="toggleTheme()" title="Basculer le thème">🌓</button>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <span class="sidebar-label">Plan du cours</span>
+    <a class="nav-item active" onclick="showSection(0)" href="#"><span class="dot"></span><span class="num">00</span><span>Introduction</span></a>
+    <a class="nav-item" onclick="showSection(1)" href="#"><span class="dot"></span><span class="num">01</span><span>Codage de l'info</span></a>
+    <a class="nav-item" onclick="showSection(2)" href="#"><span class="dot"></span><span class="num">02</span><span>Série vs Parallèle</span></a>
+    <a class="nav-item" onclick="showSection(3)" href="#"><span class="dot"></span><span class="num">03</span><span>Simplex / Duplex</span></a>
+    <a class="nav-item" onclick="showSection(4)" href="#"><span class="dot"></span><span class="num">04</span><span>Synchro / Asynchro</span></a>
+    <a class="nav-item" onclick="showSection(5)" href="#"><span class="dot"></span><span class="num">05</span><span>Protocoles & Trames</span></a>
+    <a class="nav-item" onclick="showSection(6)" href="#"><span class="dot"></span><span class="num">✓</span><span>Auto-évaluation</span></a>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+
+    <!-- ========== SECTION 0: INTRO ========== -->
+    <div class="section active" id="sec0">
+      <div class="hero">
+        <div class="hero-eyebrow">Sciences de l'Ingénieur — 1ère Spécialité</div>
+        <div class="hero-title">Transmission<br>des Données</div>
+        <div class="hero-sub">Comment les systèmes numériques échangent-ils l'information ? De la représentation binaire aux protocoles de communication, explorez les mécanismes fondamentaux qui font circuler les données.</div>
+        <div class="hero-chips">
+          <span class="hero-chip c1">Codage binaire</span>
+          <span class="hero-chip c2">Série / Parallèle</span>
+          <span class="hero-chip c3">Simplex · Half · Full</span>
+          <span class="hero-chip c4">Bus CAN · Ethernet</span>
+        </div>
+      </div>
+
+      <h3>Au programme de ce cours</h3>
+      <div class="plan-grid">
+        <div class="plan-item" onclick="showSection(1)">
+          <span class="plan-num">01</span>
+          Codage de l'information — bits, octets, masques
+        </div>
+        <div class="plan-item" onclick="showSection(2)">
+          <span class="plan-num">02</span>
+          Transmission série et parallèle
+        </div>
+        <div class="plan-item" onclick="showSection(3)">
+          <span class="plan-num">03</span>
+          Simplex, Half-duplex, Full-duplex
+        </div>
+        <div class="plan-item" onclick="showSection(4)">
+          <span class="plan-num">04</span>
+          Synchrone et asynchrone
+        </div>
+        <div class="plan-item" onclick="showSection(5)">
+          <span class="plan-num">05</span>
+          Protocoles, trames CAN & Ethernet
+        </div>
+        <div class="plan-item" onclick="showSection(6)">
+          <span class="plan-num">✓</span>
+          Auto-évaluation — 6 questions
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💡 Pourquoi ce cours ?</div>
+        <p>Tout système mécatronique moderne communique : une voiture échange des données entre ses capteurs et son calculateur via un bus CAN, votre ordinateur envoie des trames Ethernet sur le réseau, votre USB transfère des fichiers bit par bit. Comprendre comment fonctionne cette transmission d'information est essentiel pour concevoir et analyser des systèmes.</p>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn primary ml" onclick="showSection(1)">Commencer le cours →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 1: CODAGE ========== -->
+    <div class="section" id="sec1">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 class="section-title">Codage de l'information</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📡 Du signal analogique au numérique</div>
+        <p>Une information peut être un son, une image, une vidéo, un texte… Pour être traitée par un ordinateur ou une carte électronique, elle doit être codée sous forme de <strong>signaux numériques : des suites de « 0 » et de « 1 »</strong>.</p>
+        <p>La numérisation transforme un signal analogique (continu) en un signal numérique (fini) via deux étapes : l'<strong>échantillonnage</strong> puis la <strong>conversion analogique-numérique (CAN)</strong>.</p>
+      </div>
+
+      <h3>Le bit et l'octet</h3>
+
+      <div class="definition">
+        <strong>Bit</strong> (binary digit, noté <strong>b</strong> minuscule) — la plus petite unité d'information manipulable par une machine numérique. Un bit vaut <strong>0</strong> ou <strong>1</strong>.
+      </div>
+
+      <div class="definition">
+        <strong>Octet</strong> (byte, noté <strong>B</strong> majuscule) — groupement de <strong>8 bits</strong>. Il peut coder 256 valeurs différentes (de 0 à 255, soit 2⁸ combinaisons).
+      </div>
+
+      <h3>Poids des bits — MSB et LSB</h3>
+      <p>Dans un nombre binaire, chaque bit a un <strong>poids</strong> (valeur) qui dépend de sa position, de droite à gauche, en puissances de 2.</p>
+
+      <div class="card" style="overflow-x:auto;">
+        <div class="card-title">🔢 Représentation d'un octet</div>
+        <div style="padding-top:24px; padding-bottom:4px;">
+          <div class="bit-row" id="byteDisplay" style="justify-content:center; gap:6px;">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; gap:6px; margin-top:6px; font-size:0.65rem; font-family:var(--font-mono); color:var(--fg-muted);">
+          <div style="width:38px;text-align:center;">2⁷=128</div>
+          <div style="width:38px;text-align:center;">2⁶=64</div>
+          <div style="width:38px;text-align:center;">2⁵=32</div>
+          <div style="width:38px;text-align:center;">2⁴=16</div>
+          <div style="width:38px;text-align:center;">2³=8</div>
+          <div style="width:38px;text-align:center;">2²=4</div>
+          <div style="width:38px;text-align:center;">2¹=2</div>
+          <div style="width:38px;text-align:center;">2⁰=1</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:12px; font-size:0.72rem; font-family:var(--font-mono);">
+          <span style="color:var(--accent2);">← MSB (bit de poids fort)</span>
+          <span style="color:var(--warn);">LSB (bit de poids faible) →</span>
+        </div>
+      </div>
+
+      <h3>🎛️ Convertisseur interactif décimal ↔ binaire</h3>
+      <div class="converter">
+        <div class="converter-row">
+          <label style="font-size:0.8rem;color:var(--fg-muted);">Décimal :</label>
+          <input type="number" id="decInput" min="0" max="255" value="181" oninput="updateFromDec()">
+          <span class="converter-eq">=</span>
+          <span id="hexVal" class="convert-hex">0xB5</span>
+          <span class="converter-eq">hex</span>
+        </div>
+        <div class="convert-bits" id="convBits"><!-- JS --></div>
+        <p style="font-size:0.75rem;margin-top:10px;">👆 Clique sur les bits pour les basculer — la valeur décimale se met à jour !</p>
+      </div>
+
+      <h3>L'opération de masquage (ET logique)</h3>
+      <p>Pour <strong>isoler certains bits</strong> d'un octet, on applique un <strong>masque</strong> via l'opération logique <strong>ET (AND)</strong> :</p>
+      <ul style="color:var(--fg-muted); padding-left:20px; margin-bottom:16px; line-height:2;">
+        <li>Bit du masque = <span class="tag tag-b">1</span> → le bit de la donnée est <strong>conservé</strong></li>
+        <li>Bit du masque = <span class="tag tag-p">0</span> → le bit de la donnée est <strong>forcé à 0</strong></li>
+      </ul>
+
+      <div class="mask-demo">
+        <div class="mask-op">Données ET Masque = Résultat</div>
+        <div class="mask-row">
+          <span class="mask-label">Données</span>
+          <div class="mask-bits" id="maskData"></div>
+        </div>
+        <div class="mask-row">
+          <span class="mask-label">Masque</span>
+          <div class="mask-bits" id="maskMask"></div>
+        </div>
+        <div class="mask-sep"></div>
+        <div class="mask-row">
+          <span class="mask-label">Résultat</span>
+          <div class="mask-bits" id="maskResult"></div>
+        </div>
+        <button class="tx-btn" onclick="animateMask()" id="maskBtn">▶ Animer le masquage</button>
+      </div>
+
+      <div class="info-box">
+        <strong>Exemple du cours :</strong> masque <code>1100 0000</code> sur la donnée <code>1011 0001</code> → résultat <code>1000 0000</code>. Les 2 bits de poids fort sont conservés, les 6 autres sont mis à 0.
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(0)">← Retour</button>
+        <button class="nav-btn primary ml" onclick="showSection(2)">Transmission série / parallèle →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 2: SERIE / PARALLELE ========== -->
+    <div class="section" id="sec2">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 class="section-title">Transmission série et parallèle</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">ℹ️ Mode de transmission</div>
+        <p>Le <strong>mode de transmission</strong> désigne le nombre de bits pouvant être transmis simultanément. Un processeur traite généralement 8, 16, 32 ou 64 bits à la fois.</p>
+      </div>
+
+      <h3>Transmission parallèle</h3>
+      <div class="definition">
+        <strong>Liaison parallèle</strong> — N bits sont envoyés <em>simultanément</em> sur N fils. Rapide mais limitée aux <strong>courtes distances</strong> (câbles nappes, bus internes).
+      </div>
+
+      <div class="transmission-demo">
+        <div class="tx-label">Simulation — Transmission parallèle (8 fils)</div>
+        <div class="tx-vis" id="paraVis">
+          <div class="tx-node emit">ÉMETTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">1011 0001</div></div>
+          <div class="tx-wires" id="paraWires"></div>
+          <div class="tx-node recv" id="paraRecv">RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">— — — —</div></div>
+        </div>
+        <button class="tx-btn" onclick="animatePara()" id="paraBtn">▶ Envoyer l'octet en parallèle</button>
+      </div>
+
+      <h3>Transmission série</h3>
+      <div class="definition">
+        <strong>Liaison série</strong> — les bits sont envoyés <em>l'un après l'autre</em> sur un seul fil. Utilisée sur de <strong>longues distances</strong> (USB, RS-232, CAN…).
+      </div>
+
+      <div class="transmission-demo">
+        <div class="tx-label">Simulation — Transmission série (1 fil)</div>
+        <div class="tx-vis" id="serieVis">
+          <div class="tx-node emit">ÉMETTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">1011 0001</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:0 10px;min-width:0;overflow:hidden;">
+            <div class="tx-wire" id="serieWire" style="height:28px;">
+              <div id="seriePacket" style="position:absolute;top:50%;transform:translateY(-50%);height:12px;width:28px;border-radius:100px;background:var(--accent);box-shadow:0 0 8px var(--accent);opacity:0;left:0;transition:none;"></div>
+            </div>
+            <div id="serieBitLabel" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--fg-muted);text-align:center;">En attente…</div>
+          </div>
+          <div class="tx-node recv" id="serieRecv">RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">— — — —</div></div>
+        </div>
+        <button class="tx-btn" onclick="animateSerie()" id="serieBtn">▶ Envoyer bit par bit</button>
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">⚖️ Comparaison</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);">
+                <th style="padding:10px;text-align:left;color:var(--fg-muted);font-weight:600;"></th>
+                <th style="padding:10px;text-align:center;color:var(--accent);">Parallèle</th>
+                <th style="padding:10px;text-align:center;color:var(--accent2);">Série</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Nombre de fils</td>
+                <td style="padding:9px 10px;text-align:center;font-family:var(--font-mono);color:var(--accent);">N (ex: 8)</td>
+                <td style="padding:9px 10px;text-align:center;font-family:var(--font-mono);color:var(--accent2);">1</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Vitesse</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--success);">✓ Rapide</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--warn);">~ Plus lent</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Distance</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--warn);">⚠ Courte</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--success);">✓ Longue</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 10px;color:var(--fg-muted);">Exemples</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.78rem;color:var(--fg-muted);">Bus mémoire, IDE</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.78rem;color:var(--fg-muted);">USB, CAN, RS-232</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(1)">← Codage</button>
+        <button class="nav-btn primary ml" onclick="showSection(3)">Simplex / Duplex →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 3: DUPLEX ========== -->
+    <div class="section" id="sec3">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 class="section-title">Simplex, Half-duplex & Full-duplex</h2>
+      </div>
+
+      <p>Selon le <strong>sens des échanges</strong>, on distingue 3 modes de transmission. Clique sur un mode pour visualiser son fonctionnement :</p>
+
+      <div class="duplex-cards">
+        <div class="duplex-card sx active" onclick="selectDuplex('sx')">
+          <div class="duplex-card-title">Simplex</div>
+          <div class="duplex-desc">Un seul sens, en permanence. L'émetteur envoie, le récepteur reçoit.</div>
+        </div>
+        <div class="duplex-card hd" onclick="selectDuplex('hd')">
+          <div class="duplex-card-title">Half-duplex</div>
+          <div class="duplex-desc">Les deux sens, mais pas simultanément. Chacun émet à son tour.</div>
+        </div>
+        <div class="duplex-card fd" onclick="selectDuplex('fd')">
+          <div class="duplex-card-title">Full-duplex</div>
+          <div class="duplex-desc">Les deux sens en même temps. Émission et réception simultanées.</div>
+        </div>
+      </div>
+
+      <div class="duplex-vis" id="duplexVis">
+        <div class="d-node" id="dNodeA">A</div>
+        <div class="d-channel" id="dChannel"><!-- JS --></div>
+        <div class="d-node" id="dNodeB">B</div>
+      </div>
+
+      <div id="duplexDesc" class="definition"></div>
+
+      <h3>Exemples concrets</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px;" class="plan-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="card" style="margin:0;cursor:default;">
+          <div class="card-title" style="color:var(--accent2);">Simplex</div>
+          <p style="font-size:0.82rem;">Clavier → Ordinateur<br>Ordinateur → Écran<br>Radio FM → Auditeurs</p>
+        </div>
+        <div class="card" style="margin:0;cursor:default;">
+          <div class="card-title" style="color:var(--warn);">Half-duplex</div>
+          <p style="font-size:0.82rem;">Talkie-walkie<br>WiFi (en pratique)<br>Bus CAN</p>
+        </div>
+        <div class="card" style="margin:0;cursor:default;">
+          <div class="card-title" style="color:var(--success);">Full-duplex</div>
+          <p style="font-size:0.82rem;">Téléphone<br>Ethernet filaire<br>USB 3.0</p>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(2)">← Série / Parallèle</button>
+        <button class="nav-btn primary ml" onclick="showSection(4)">Synchro / Asynchro →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 4: SYNCHRO ========== -->
+    <div class="section" id="sec4">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2 class="section-title">Transmission synchrone & asynchrone</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">❓ Le problème de synchronisation</div>
+        <p>Sur une liaison série, un seul fil transporte l'information. Comment le récepteur sait-il où commence et où finit un caractère ? Imaginons qu'un seul bit « 1 » soit transmis pendant une longue période de silence… le récepteur ne saurait pas si c'est le bit 0, 1, 2, 3… d'un octet.</p>
+      </div>
+
+      <h3>Transmission asynchrone</h3>
+      <div class="definition">
+        Chaque caractère est entouré de bits de <strong>synchronisation</strong> : un <strong>bit START</strong> (début) et un ou deux <strong>bits STOP</strong> (fin). Les deux horloges n'ont pas besoin d'être parfaitement synchronisées.
+      </div>
+
+      <p>Format d'une trame asynchrone (10 bits pour 1 octet) :</p>
+      <div class="frame-vis" id="asyncFrame">
+        <div class="frame-field start">
+          <div class="frame-field-label">START</div>
+          <div class="frame-field-val">0</div>
+        </div>
+        <div class="frame-field data">
+          <div class="frame-field-label">Données (8 bits)</div>
+          <div class="frame-field-val" style="font-size:0.75rem;letter-spacing:0.08em;">1 0 1 1 0 0 0 1</div>
+        </div>
+        <div class="frame-field parity">
+          <div class="frame-field-label">Parité</div>
+          <div class="frame-field-val">P</div>
+        </div>
+        <div class="frame-field stop">
+          <div class="frame-field-label">STOP</div>
+          <div class="frame-field-val">1</div>
+        </div>
+        <div class="frame-field stop">
+          <div class="frame-field-label">STOP</div>
+          <div class="frame-field-val">1</div>
+        </div>
+      </div>
+
+      <div id="asyncAnim" style="margin:16px 0;">
+        <div style="font-size:0.8rem;color:var(--fg-muted);margin-bottom:10px;">Signal sur le fil :</div>
+        <svg id="asyncSvg" width="100%" height="80" viewBox="0 0 700 80" style="background:var(--bg-ele);border:1px solid var(--border);border-radius:10px;overflow:visible;"></svg>
+        <button class="tx-btn" onclick="animateAsync()" style="margin-top:10px;">▶ Visualiser la trame asynchrone</button>
+      </div>
+
+      <h3>Transmission synchrone</h3>
+      <div class="definition">
+        L'émetteur et le récepteur sont cadencés sur la <strong>même horloge</strong>. Les données sont transmises en continu. Des informations supplémentaires garantissent l'absence d'erreurs.
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">⚖️ Comparaison</div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);">
+                <th style="padding:10px;text-align:left;color:var(--fg-muted);font-weight:600;"></th>
+                <th style="padding:10px;text-align:center;color:var(--accent);">Asynchrone</th>
+                <th style="padding:10px;text-align:center;color:var(--accent2);">Synchrone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Synchronisation</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.82rem;">Bits START/STOP</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.82rem;">Horloge commune</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Overhead</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--warn);">~25% (2 bits/8)</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--success);">Faible</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 10px;color:var(--fg-muted);">Complexité</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--success);">Simple</td>
+                <td style="padding:9px 10px;text-align:center;color:var(--warn);">Plus complexe</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 10px;color:var(--fg-muted);">Exemples</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.78rem;color:var(--fg-muted);">RS-232, UART</td>
+                <td style="padding:9px 10px;text-align:center;font-size:0.78rem;color:var(--fg-muted);">SPI, I²C, Ethernet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(3)">← Simplex / Duplex</button>
+        <button class="nav-btn primary ml" onclick="showSection(5)">Protocoles & Trames →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 5: PROTOCOLES ========== -->
+    <div class="section" id="sec5">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2 class="section-title">Protocoles & Trames</h2>
+      </div>
+
+      <div class="definition">
+        Un <strong>protocole</strong> est un langage commun entre les acteurs d'une communication. Il définit le <strong>format de la trame</strong> — l'enveloppe dans laquelle le message est encapsulé.
+      </div>
+
+      <h3>a) Bus de terrain — Exemple : Bus CAN</h3>
+
+      <div class="card">
+        <div class="card-title">🚗 Qu'est-ce qu'un bus de terrain ?</div>
+        <p>Un <strong>bus de terrain</strong> relie des capteurs et actionneurs sur un domaine spécifique (véhicule, site industriel). Il transmet des messages courts avec une grande fiabilité et des temps de réaction très courts, peu sensibles aux perturbations.</p>
+        <p>Le <strong>bus CAN</strong> (Controller Area Network) utilise une <strong>paire filaire différentielle</strong> (2 fils). Basé sur la diffusion générale : aucun organe n'est adressé directement — chaque nœud décide d'ignorer ou non un message.</p>
+      </div>
+
+      <p>Clique sur chaque champ pour en apprendre plus :</p>
+      <div class="can-frame" id="canFrame">
+        <div class="can-field sof" onclick="selectCan('sof')">
+          <div class="can-field-name">SOF</div>
+          <div class="can-field-size">1 bit</div>
+        </div>
+        <div class="can-field id" onclick="selectCan('id')">
+          <div class="can-field-name">ID</div>
+          <div class="can-field-size">11 bits</div>
+        </div>
+        <div class="can-field" onclick="selectCan('rtr')">
+          <div class="can-field-name">RTR</div>
+          <div class="can-field-size">1 bit</div>
+        </div>
+        <div class="can-field ctrl" onclick="selectCan('ctrl')">
+          <div class="can-field-name">CTRL</div>
+          <div class="can-field-size">6 bits</div>
+        </div>
+        <div class="can-field id" onclick="selectCan('data')" style="min-width:90px;">
+          <div class="can-field-name">DONNÉES</div>
+          <div class="can-field-size">0–64 bits</div>
+        </div>
+        <div class="can-field crc" onclick="selectCan('crc')">
+          <div class="can-field-name">CRC</div>
+          <div class="can-field-size">16 bits</div>
+        </div>
+        <div class="can-field ack" onclick="selectCan('ack')">
+          <div class="can-field-name">ACK</div>
+          <div class="can-field-size">2 bits</div>
+        </div>
+        <div class="can-field eof" onclick="selectCan('eof')">
+          <div class="can-field-name">EOF</div>
+          <div class="can-field-size">7 bits</div>
+        </div>
+      </div>
+      <div class="can-tooltip" id="canTooltip"></div>
+
+      <h3>b) Trame Ethernet</h3>
+
+      <div class="card">
+        <div class="card-title">🌐 Protocole Ethernet</div>
+        <p>Ethernet est utilisé entre systèmes possédant une <strong>carte réseau (adresse MAC)</strong>. C'est le protocole dominant des réseaux locaux (LAN).</p>
+      </div>
+
+      <p>Clique sur chaque champ pour en apprendre plus :</p>
+      <div class="eth-row" id="ethFrame">
+        <div class="eth-block pream" onclick="selectEth('pream')">
+          <div class="eth-name">Préambule</div>
+          <div class="eth-bytes">8 octets</div>
+        </div>
+        <div class="eth-block dst" onclick="selectEth('dst')">
+          <div class="eth-name">@ Dest.</div>
+          <div class="eth-bytes">6 octets</div>
+        </div>
+        <div class="eth-block src" onclick="selectEth('src')">
+          <div class="eth-name">@ Source</div>
+          <div class="eth-bytes">6 octets</div>
+        </div>
+        <div class="eth-block etype" onclick="selectEth('etype')">
+          <div class="eth-name">Ether-Type</div>
+          <div class="eth-bytes">2 octets</div>
+        </div>
+        <div class="eth-block data" onclick="selectEth('data')">
+          <div class="eth-name">Données</div>
+          <div class="eth-bytes">46–1500 oct.</div>
+        </div>
+        <div class="eth-block crc" onclick="selectEth('crc')">
+          <div class="eth-name">CRC</div>
+          <div class="eth-bytes">4 octets</div>
+        </div>
+      </div>
+      <div class="can-tooltip" id="ethTooltip"></div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(4)">← Synchro / Asynchro</button>
+        <button class="nav-btn primary ml" onclick="showSection(6)">Auto-évaluation →</button>
+      </div>
+    </div>
+
+    <!-- ========== SECTION 6: QUIZ ========== -->
+    <div class="section" id="sec6">
+      <div class="section-header">
+        <span class="section-num">✓</span>
+        <h2 class="section-title">Auto-évaluation</h2>
+      </div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <div class="card-title">📋 6 questions pour tester tes connaissances</div>
+        <p>Réponds à chaque question. Tu verras immédiatement si ta réponse est correcte. Les explications t'aideront à comprendre tes erreurs.</p>
+      </div>
+
+      <!-- Q1 -->
+      <div class="quiz-question" id="q1">
+        <div class="quiz-q-text">Q1 — Quel est le résultat du masque <code>0110 0011</code> sur le mot <code>1010 0110</code> ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(1,'a','a')"><span class="quiz-option-key">a</span>0010 0010</div>
+          <div class="quiz-option" onclick="answer(1,'b','a')"><span class="quiz-option-key">b</span>1000 0100</div>
+          <div class="quiz-option" onclick="answer(1,'c','a')"><span class="quiz-option-key">c</span>1110 0111</div>
+        </div>
+        <div class="quiz-fb" id="q1fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-question" id="q2">
+        <div class="quiz-q-text">Q2 — On a <code>0101 1100</code>. On souhaite masquer les 4 bits de poids faible. Quel masque appliquer ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(2,'a','b')"><span class="quiz-option-key">a</span>0000 1111</div>
+          <div class="quiz-option" onclick="answer(2,'b','b')"><span class="quiz-option-key">b</span>1111 0000</div>
+          <div class="quiz-option" onclick="answer(2,'c','b')"><span class="quiz-option-key">c</span>0101 1100</div>
+        </div>
+        <div class="quiz-fb" id="q2fb"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-question" id="q3">
+        <div class="quiz-q-text">Q3 — Soit le mot en hexadécimal <code>A3</code>. Que vaut le bit de poids faible (LSB) ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(3,'a','b')"><span class="quiz-option-key">a</span>0</div>
+          <div class="quiz-option" onclick="answer(3,'b','b')"><span class="quiz-option-key">b</span>1</div>
+        </div>
+        <div class="quiz-fb" id="q3fb"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-question" id="q4">
+        <div class="quiz-q-text">Q4 — Résultat du masque <code>0110 0000</code> sur le mot <code>3C</code> (hexadécimal) ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(4,'a','c')"><span class="quiz-option-key">a</span>0100 0000</div>
+          <div class="quiz-option" onclick="answer(4,'b','c')"><span class="quiz-option-key">b</span>0010 0000</div>
+          <div class="quiz-option" onclick="answer(4,'c','c')"><span class="quiz-option-key">c</span>0000 0000</div>
+          <div class="quiz-option" onclick="answer(4,'d','c')"><span class="quiz-option-key">d</span>0110 0000</div>
+        </div>
+        <div class="quiz-fb" id="q4fb"></div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="quiz-question" id="q5">
+        <div class="quiz-q-text">Q5 — Lors d'une transmission, chaque octet est précédé d'un bit START et suivi d'un bit de parité et de 2 bits STOP. Combien de bits sont transmis pour 1 octet ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(5,'a','d')"><span class="quiz-option-key">a</span>8</div>
+          <div class="quiz-option" onclick="answer(5,'b','d')"><span class="quiz-option-key">b</span>9</div>
+          <div class="quiz-option" onclick="answer(5,'c','d')"><span class="quiz-option-key">c</span>10</div>
+          <div class="quiz-option" onclick="answer(5,'d','d')"><span class="quiz-option-key">d</span>12</div>
+        </div>
+        <div class="quiz-fb" id="q5fb"></div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="quiz-question" id="q6">
+        <div class="quiz-q-text">Q6 — On envoie un message de 18 bits à 2500 bit/s. Quelle est la durée de l'émission ?</div>
+        <div class="quiz-options">
+          <div class="quiz-option" onclick="answer(6,'a','b')"><span class="quiz-option-key">a</span>139 s</div>
+          <div class="quiz-option" onclick="answer(6,'b','b')"><span class="quiz-option-key">b</span>0.0072 s (7.2 ms)</div>
+          <div class="quiz-option" onclick="answer(6,'c','b')"><span class="quiz-option-key">c</span>72 ms</div>
+          <div class="quiz-option" onclick="answer(6,'d','b')"><span class="quiz-option-key">d</span>45 ms</div>
+        </div>
+        <div class="quiz-fb" id="q6fb"></div>
+      </div>
+
+      <!-- SCORE -->
+      <div class="score-display" id="scoreDisplay">
+        <div class="score-num" id="scoreNum">0/6</div>
+        <div class="score-label">bonne(s) réponse(s)</div>
+        <div class="score-msg" id="scoreMsg"></div>
+        <button class="tx-btn" onclick="resetQuiz()" style="margin-top:16px;">↺ Recommencer</button>
+      </div>
+
+      <div class="section-nav">
+        <button class="nav-btn" onclick="showSection(5)">← Protocoles</button>
+        <button class="nav-btn" onclick="showSection(0)">↩ Accueil</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ===== STATE =====
+let currentSection = 0;
+const totalSections = 7;
+const visitedSections = new Set([0]);
+let duplexMode = 'sx';
+let duplexInterval = null;
+let quizAnswers = {};
+let quizDone = {};
+
+// ===== NAVIGATION =====
+function showSection(n) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec' + n).classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', i === n);
+    if (visitedSections.has(i) && i !== n) el.classList.add('done');
+    else el.classList.remove('done');
+  });
+
+  currentSection = n;
+  visitedSections.add(n);
+  document.getElementById('progressFill').style.width = ((n / (totalSections - 1)) * 100) + '%';
+  document.getElementById('mainContent').scrollTop = 0;
+
+  if (n === 1) initBitDisplay();
+  if (n === 2) initParaWires();
+  if (n === 3) selectDuplex(duplexMode);
+  if (n === 4) drawAsyncSvg();
+}
+
+// ===== THEME =====
+function toggleTheme() {
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}
+
+// ===== SECTION 1: BINARY DISPLAY =====
+const BYTE_VAL = [1,0,1,1,0,0,0,1]; // 0xB1 = 177
+
+function initBitDisplay() {
+  const container = document.getElementById('byteDisplay');
+  container.innerHTML = '';
+  BYTE_VAL.forEach((b, i) => {
+    if (i === 4) {
+      const sep = document.createElement('div');
+      sep.className = 'bit-sep';
+      sep.textContent = ' ';
+      container.appendChild(sep);
+    }
+    const cell = document.createElement('div');
+    cell.className = 'bit-cell' + (b ? ' one' : '') + (i === 0 ? ' msb' : '') + (i === 7 ? ' lsb' : '');
+    const lbl = document.createElement('span');
+    lbl.className = 'bit-label';
+    lbl.textContent = i === 0 ? 'MSB' : i === 7 ? 'LSB' : '';
+    cell.appendChild(lbl);
+    cell.appendChild(document.createTextNode(b));
+    container.appendChild(cell);
+  });
+
+  initConverter();
+  initMask();
+}
+
+// ===== CONVERTER =====
+function initConverter() {
+  updateFromDec();
+}
+
+function updateFromDec() {
+  const v = Math.min(255, Math.max(0, parseInt(document.getElementById('decInput').value) || 0));
+  renderBits(v);
+}
+
+function renderBits(v) {
+  const container = document.getElementById('convBits');
+  container.innerHTML = '';
+  for (let i = 7; i >= 0; i--) {
+    const bit = (v >> i) & 1;
+    const cell = document.createElement('div');
+    cell.className = 'c-bit ' + (bit ? 'one' : 'zero');
+    cell.textContent = bit;
+    const idx = 7 - i;
+    cell.onclick = () => {
+      const cur = parseInt(document.getElementById('decInput').value) || 0;
+      const toggled = cur ^ (1 << i);
+      document.getElementById('decInput').value = toggled;
+      renderBits(toggled);
+    };
+    container.appendChild(cell);
+  }
+  document.getElementById('hexVal').textContent = '0x' + v.toString(16).toUpperCase().padStart(2, '0');
+  document.getElementById('decInput').value = v;
+}
+
+// ===== MASK =====
+const MASK_DATA = [1,0,1,1,0,0,0,1];
+const MASK_MASK = [1,1,0,0,0,0,0,0];
+let maskAnimated = false;
+
+function initMask() {
+  renderMaskRow('maskData', MASK_DATA, 'data');
+  renderMaskRow('maskMask', MASK_MASK, 'mask');
+  renderMaskRow('maskResult', MASK_DATA.map(() => 0), 'result-init');
+}
+
+function renderMaskRow(id, bits, type) {
+  const container = document.getElementById(id);
+  container.innerHTML = '';
+  bits.forEach((b, i) => {
+    if (i === 4) {
+      const sp = document.createElement('div');
+      sp.style.cssText = 'width:6px;';
+      container.appendChild(sp);
+    }
+    const cell = document.createElement('div');
+    cell.className = 'mask-bit';
+    if (type === 'data') cell.className += b ? ' on' : ' off';
+    else if (type === 'mask') cell.className += b ? ' on' : ' off';
+    else cell.className += ' off';
+    cell.textContent = b;
+    cell.id = id + '_' + i;
+    container.appendChild(cell);
+  });
+}
+
+function animateMask() {
+  const result = MASK_DATA.map((d, i) => d & MASK_MASK[i]);
+  const btn = document.getElementById('maskBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Animation…';
+
+  result.forEach((b, i) => {
+    setTimeout(() => {
+      const cell = document.getElementById('maskResult_' + i);
+      if (cell) {
+        cell.textContent = b;
+        cell.className = 'mask-bit ' + (b ? 'res-on' : 'res-off');
+      }
+      if (i === result.length - 1) {
+        btn.disabled = false;
+        btn.textContent = '↺ Rejouer';
+        // reset after 3s
+        setTimeout(() => {
+          renderMaskRow('maskResult', MASK_DATA.map(() => 0), 'result-init');
+          btn.textContent = '▶ Animer le masquage';
+        }, 3000);
+      }
+    }, i * 180 + 300);
+  });
+}
+
+// ===== SECTION 2: PARALLEL =====
+function initParaWires() {
+  const container = document.getElementById('paraWires');
+  container.innerHTML = '';
+  const bits = [1,0,1,1,0,0,0,1];
+  bits.forEach((b, i) => {
+    const wire = document.createElement('div');
+    wire.className = 'tx-wire';
+    wire.style.height = '20px';
+    const pkt = document.createElement('div');
+    pkt.className = 'tx-packet p1';
+    pkt.style.width = '16px';
+    pkt.style.background = b ? 'var(--accent)' : 'var(--accent2)';
+    pkt.id = 'paraP' + i;
+    wire.appendChild(pkt);
+    container.appendChild(wire);
+  });
+}
+
+function animatePara() {
+  const btn = document.getElementById('paraBtn');
+  btn.disabled = true;
+  const bits = [1,0,1,1,0,0,0,1];
+  const recv = document.getElementById('paraRecv');
+  recv.innerHTML = 'RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">⏳</div>';
+
+  bits.forEach((b, i) => {
+    const pkt = document.getElementById('paraP' + i);
+    if (!pkt) return;
+    pkt.style.transition = 'left 0.8s linear, opacity 0.1s';
+    pkt.style.opacity = '1';
+    pkt.style.left = '0%';
+    setTimeout(() => {
+      pkt.style.left = '110%';
+    }, 50);
+    setTimeout(() => {
+      pkt.style.opacity = '0';
+      pkt.style.left = '-5%';
+      pkt.style.transition = 'none';
+    }, 900);
+  });
+
+  setTimeout(() => {
+    recv.innerHTML = 'RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--success);">1011 0001 ✓</div>';
+    btn.disabled = false;
+    btn.textContent = '↺ Renvoyer';
+  }, 950);
+}
+
+// ===== SERIE =====
+let serieRunning = false;
+function animateSerie() {
+  if (serieRunning) return;
+  serieRunning = true;
+  const btn = document.getElementById('serieBtn');
+  btn.disabled = true;
+  const bits = [1,0,1,1,0,0,0,1];
+  const labels = ['b7(MSB)','b6','b5','b4','b3','b2','b1','b0(LSB)'];
+  const pkt = document.getElementById('seriePacket');
+  const lbl = document.getElementById('serieBitLabel');
+  const recv = document.getElementById('serieRecv');
+  recv.innerHTML = 'RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--fg-muted);">⏳</div>';
+
+  let received = '';
+
+  function sendBit(i) {
+    if (i >= bits.length) {
+      lbl.textContent = '✓ Transmission complète';
+      recv.innerHTML = 'RÉCEPTEUR<div style="font-size:0.65rem;margin-top:2px;color:var(--success);">' + received + ' ✓</div>';
+      btn.disabled = false;
+      btn.textContent = '↺ Renvoyer';
+      serieRunning = false;
+      return;
+    }
+    lbl.textContent = labels[i] + ' = ' + bits[i];
+    pkt.style.background = bits[i] ? 'var(--accent)' : 'var(--accent2)';
+    pkt.style.boxShadow = bits[i] ? '0 0 8px var(--accent)' : '0 0 6px var(--accent2)';
+    pkt.style.transition = 'none';
+    pkt.style.left = '-5%';
+    pkt.style.opacity = '1';
+    requestAnimationFrame(() => {
+      pkt.style.transition = 'left 0.55s linear';
+      pkt.style.left = '110%';
+    });
+    setTimeout(() => {
+      pkt.style.opacity = '0';
+      received += bits[i];
+      if (i % 4 === 3 && i < 7) received += ' ';
+      sendBit(i + 1);
+    }, 580);
+  }
+
+  setTimeout(() => sendBit(0), 200);
+}
+
+// ===== SECTION 3: DUPLEX =====
+const duplexData = {
+  sx: {
+    desc: '<strong>Simplex</strong> — Les données circulent dans <strong>un seul sens</strong>, de l\'émetteur vers le récepteur. Idéal quand le retour d\'information n\'est pas nécessaire (souris vers PC, PC vers écran, émission radio).',
+    arrows: [{ dir: 'fwd', active: true }]
+  },
+  hd: {
+    desc: '<strong>Half-duplex</strong> — Les données circulent dans <strong>un sens OU l\'autre, jamais simultanément</strong>. Chaque extrémité émet à son tour. Exemple : talkie-walkie, bus CAN.',
+    arrows: [{ dir: 'fwd', active: true }, { dir: 'rev', active: true }]
+  },
+  fd: {
+    desc: '<strong>Full-duplex</strong> — Les données circulent dans <strong>les deux sens simultanément</strong>. Chaque extrémité peut émettre et recevoir en même temps. Exemple : téléphone, Ethernet filaire.',
+    arrows: [{ dir: 'both', active: true }]
+  }
+};
+
+function selectDuplex(mode) {
+  duplexMode = mode;
+  document.querySelectorAll('.duplex-card').forEach(c => c.classList.remove('active'));
+  document.querySelector('.duplex-card.' + mode).classList.add('active');
+
+  if (duplexInterval) { clearInterval(duplexInterval); duplexInterval = null; }
+
+  const ch = document.getElementById('dChannel');
+  ch.innerHTML = '';
+  document.getElementById('duplexDesc').innerHTML = duplexData[mode].desc;
+
+  if (mode === 'sx') {
+    ch.innerHTML = buildArrow('A→B', 'blue', 'fwd');
+    animateArrow('fwd');
+  } else if (mode === 'hd') {
+    ch.innerHTML = buildArrow('A→B', 'blue', 'fwd') + buildArrow('B→A', 'purple', 'rev');
+    let toggle = true;
+    function hdAnim() {
+      document.querySelectorAll('.d-arrow-fill.blue').forEach(e => { e.style.animationPlayState = toggle ? 'running' : 'paused'; });
+      document.querySelectorAll('.d-arrow-fill.purple').forEach(e => { e.style.animationPlayState = !toggle ? 'running' : 'paused'; });
+      toggle = !toggle;
+    }
+    hdAnim();
+    duplexInterval = setInterval(hdAnim, 2000);
+  } else {
+    ch.innerHTML = buildArrow('A↔B', 'blue', 'fwd') + buildArrow('B↔A', 'purple', 'rev');
+    document.querySelectorAll('.d-arrow-fill').forEach(e => { e.style.animationPlayState = 'running'; });
+  }
+}
+
+function buildArrow(label, color, dir) {
+  const isRev = dir === 'rev';
+  return `<div class="d-arrow">
+    ${isRev ? '<span class="d-arrow-head" style="color:var(--accent2);">◀</span>' : '<span style="font-size:0.65rem;color:var(--fg-muted);">${label}</span>'}
+    <div class="d-arrow-line">
+      <div class="d-arrow-fill ${color}" style="animation: ${isRev ? 'flowrev' : 'flow'} 1.4s linear infinite;"></div>
+    </div>
+    ${!isRev ? '<span class="d-arrow-head" style="color:var(--accent);">▶</span>' : '<span style="font-size:0.65rem;color:var(--fg-muted);">${label}</span>'}
+  </div>`.replace(/\$\{label\}/g, label);
+}
+
+function animateArrow(dir) {
+  document.querySelectorAll('.d-arrow-fill.' + (dir === 'fwd' ? 'blue' : 'purple')).forEach(e => {
+    e.style.animationPlayState = 'running';
+  });
+}
+
+// ===== SECTION 4: ASYNC SVG =====
+function drawAsyncSvg() {
+  const svg = document.getElementById('asyncSvg');
+  if (!svg) return;
+
+  // bits: START(0) + data(1,0,1,1,0,0,0,1) + PARITY(1) + STOP(1) + STOP(1) = 12 bits
+  const bits = [0, 1,0,1,1,0,0,0,1, 1, 1, 1];
+  const labels = ['START', 'D7','D6','D5','D4','D3','D2','D1','D0', 'PAR', 'STOP','STOP'];
+  const colors = ['#00e5a0','#00cfff','#00cfff','#00cfff','#00cfff','#00cfff','#00cfff','#00cfff','#00cfff','#ffb300','#ff4f6b','#ff4f6b'];
+
+  const W = 700, H = 80;
+  const margin = 10;
+  const bw = (W - margin * 2) / bits.length;
+  const midY = H / 2;
+  const high = midY - 18;
+  const low  = midY + 18;
+
+  let d = `M ${margin} ${bits[0] === 1 ? high : low}`;
+  bits.forEach((b, i) => {
+    const x = margin + i * bw;
+    const y = b === 1 ? high : low;
+    if (i > 0) {
+      const prevY = bits[i-1] === 1 ? high : low;
+      if (prevY !== y) d += ` L ${x} ${prevY} L ${x} ${y}`;
+    }
+    d += ` L ${x + bw} ${y}`;
+  });
+
+  let svgContent = `<line x1="${margin}" y1="${midY}" x2="${W-margin}" y2="${midY}" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4,4"/>`;
+
+  // colored segments
+  bits.forEach((b, i) => {
+    const x1 = margin + i * bw;
+    const x2 = x1 + bw;
+    const y = b === 1 ? high : low;
+    svgContent += `<rect x="${x1+1}" y="${Math.min(y,midY)}" width="${bw-2}" height="${Math.abs(y-midY)}" fill="${colors[i]}" opacity="0.12" rx="2"/>`;
+  });
+
+  svgContent += `<path d="${d}" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linejoin="round"/>`;
+
+  // labels
+  bits.forEach((b, i) => {
+    const cx = margin + i * bw + bw/2;
+    svgContent += `<text x="${cx}" y="${H - 4}" text-anchor="middle" font-size="8" fill="${colors[i]}" font-family="monospace">${labels[i]}</text>`;
+    svgContent += `<text x="${cx}" y="${b === 1 ? high - 4 : low + 10}" text-anchor="middle" font-size="9" fill="${colors[i]}" font-weight="bold" font-family="monospace">${b}</text>`;
+  });
+
+  svg.innerHTML = svgContent;
+}
+
+function animateAsync() {
+  drawAsyncSvg();
+}
+
+// ===== SECTION 5: CAN FRAME =====
+const canInfo = {
+  sof: '<strong>SOF — Start Of Frame</strong> (1 bit)<br>Indique le début de la transmission. Toujours à l\'état dominat (0). Synchronise tous les nœuds du bus.',
+  id: '<strong>Identificateur</strong> (11 bits)<br>Identifie l\'émetteur de la trame et la nature du message. Détermine également la priorité sur le bus (plus l\'ID est bas, plus la priorité est haute).',
+  rtr: '<strong>RTR — Remote Transmission Request</strong> (1 bit)<br>Indique s\'il s\'agit d\'une trame de données (0) ou d\'une demande de message (1).',
+  ctrl: '<strong>Champ de contrôle</strong> (6 bits)<br>Indique la longueur du champ de données en octets (DLC : 0 à 8 octets).',
+  data: '<strong>Champ de données</strong> (0 à 64 bits)<br>Les données utiles à transmettre (0 à 8 octets).',
+  crc: '<strong>CRC — Cyclic Redundancy Code</strong> (16 bits)<br>Champ de sécurité permettant de détecter une erreur dans la transmission.',
+  ack: '<strong>ACK — Acknowledge</strong> (2 bits)<br>Envoyé par le récepteur pour confirmer la bonne réception de la trame.',
+  eof: '<strong>EOF — End Of Frame</strong> (7 bits)<br>Signal de fin de trame. Indique aux autres nœuds que le bus est libre.'
+};
+
+function selectCan(field) {
+  document.querySelectorAll('.can-field').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.can-field').forEach(el => {
+    if (el.onclick.toString().includes("'" + field + "'")) el.classList.add('selected');
+  });
+  const tt = document.getElementById('canTooltip');
+  tt.innerHTML = canInfo[field] || '';
+  tt.className = 'can-tooltip show';
+}
+
+// ===== ETHERNET FRAME =====
+const ethInfo = {
+  pream: '<strong>Préambule</strong> (8 octets)<br>Annonce le début de la trame et permet la synchronisation entre émetteur et récepteur.',
+  dst: '<strong>Adresse destination</strong> (6 octets)<br>Adresse physique MAC de la carte Ethernet destinataire. Format XX:XX:XX:XX:XX:XX.',
+  src: '<strong>Adresse source</strong> (6 octets)<br>Adresse physique MAC de la carte Ethernet émettrice. Unique au monde (gravée en usine).',
+  etype: '<strong>EtherType / Type de trame</strong> (2 octets)<br>Indique quel protocole de niveau supérieur est concerné (ex: 0x0800 = IPv4, 0x0806 = ARP).',
+  data: '<strong>Données</strong> (46 à 1500 octets)<br>Les données à transmettre. Taille minimale 46 octets (bourrage de zéros si nécessaire). La taille maximale (1500 octets) est appelée MTU.',
+  crc: '<strong>CRC — Cyclic Redundancy Check</strong> (4 octets)<br>Contrôle d\'intégrité. Permet de détecter les erreurs de transmission avant de délivrer les données.'
+};
+
+function selectEth(field) {
+  document.querySelectorAll('.eth-block').forEach(el => el.classList.remove('sel'));
+  document.querySelectorAll('.eth-block').forEach(el => {
+    if (el.onclick.toString().includes("'" + field + "'")) el.classList.add('sel');
+  });
+  const tt = document.getElementById('ethTooltip');
+  tt.innerHTML = ethInfo[field] || '';
+  tt.className = 'can-tooltip show';
+}
+
+// ===== QUIZ =====
+const quizExplanations = {
+  1: { correct: 'a', exp: 'ET logique : 1010 0110 ET 0110 0011 = 0010 0010. On ne garde que les bits où les deux valent 1.' },
+  2: { correct: 'b', exp: '1111 0000 : les 4 bits de poids fort à 1 (conservés), les 4 bits de poids faible à 0 (masqués).' },
+  3: { correct: 'b', exp: 'A3 en hex = 1010 0011 en binaire. Le LSB (bit le plus à droite) = 1.' },
+  4: { correct: 'c', exp: '3C hex = 0011 1100 binaire. ET avec 0110 0000 : aucun bit commun = 0000 0000.' },
+  5: { correct: 'd', exp: '1 bit START + 8 bits données + 1 bit parité + 2 bits STOP = 12 bits au total.' },
+  6: { correct: 'b', exp: 'Durée = Nb bits / Débit = 18 / 2500 = 0.0072 s = 7.2 ms.' }
+};
+
+function answer(q, choice, correct) {
+  if (quizDone[q]) return;
+  quizDone[q] = true;
+
+  const data = quizExplanations[q];
+  const isCorrect = choice === data.correct;
+
+  const questionEl = document.getElementById('q' + q);
+  questionEl.querySelectorAll('.quiz-option').forEach(opt => {
+    const optKey = opt.querySelector('.quiz-option-key').textContent;
+    if (optKey === choice) opt.className = 'quiz-option ' + (isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect && optKey === data.correct) opt.className = 'quiz-option correct';
+    opt.onclick = null;
+  });
+
+  const fb = document.getElementById('q' + q + 'fb');
+  fb.textContent = (isCorrect ? '✓ Correct ! ' : '✗ Incorrect. ') + data.exp;
+  fb.className = 'quiz-fb ' + (isCorrect ? 'correct' : 'wrong');
+
+  quizAnswers[q] = isCorrect;
+
+  // Check if all answered
+  if (Object.keys(quizAnswers).length === 6) showScore();
+}
+
+function showScore() {
+  const score = Object.values(quizAnswers).filter(Boolean).length;
+  const disp = document.getElementById('scoreDisplay');
+  document.getElementById('scoreNum').textContent = score + '/6';
+  const msgs = {
+    0: '😕 Continue tes révisions !', 1: '😕 Continue tes révisions !',
+    2: '😐 Tu peux mieux faire !', 3: '🙂 Pas mal, mais tu peux progresser.',
+    4: '😊 Bien ! Quelques points à revoir.', 5: '😄 Très bien ! Tu maîtrises presque tout.',
+    6: '🎉 Excellent ! Tu maîtrises ce cours !'
+  };
+  document.getElementById('scoreMsg').textContent = msgs[score];
+  disp.style.display = 'block';
+}
+
+function resetQuiz() {
+  quizAnswers = {};
+  quizDone = {};
+  document.getElementById('scoreDisplay').style.display = 'none';
+  document.querySelectorAll('.quiz-option').forEach(opt => {
+    opt.className = 'quiz-option';
+    const q = opt.closest('.quiz-question').id.replace('q','');
+    const key = opt.querySelector('.quiz-option-key').textContent;
+    opt.onclick = function() { answer(parseInt(q), key, quizExplanations[q].correct); };
+  });
+  document.querySelectorAll('.quiz-fb').forEach(fb => { fb.className = 'quiz-fb'; });
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  showSection(0);
+  // Fix quiz onclick after DOM ready
+  document.querySelectorAll('.quiz-option').forEach(opt => {
+    const q = parseInt(opt.closest('.quiz-question').id.replace('q',''));
+    const key = opt.querySelector('.quiz-option-key').textContent;
+    opt.onclick = function() { answer(q, key, quizExplanations[q].correct); };
+  });
+});
+</script>
+
+</body></html>
