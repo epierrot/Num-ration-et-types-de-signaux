@@ -1,0 +1,948 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Exercices — Transmission des Données</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+:root {
+  --bg:         #07091a;
+  --bg-panel:   #0d1030;
+  --bg-panel2:  #111540;
+  --bg-input:   #0a0e28;
+  --fg:         #e8eeff;
+  --fg-mid:     #9ba8d8;
+  --fg-dim:     #5a6490;
+  --accent:     #00cfff;
+  --accent2:    #7b5cff;
+  --accent3:    #00ff99;
+  --warn:       #ffb300;
+  --danger:     #ff4f6b;
+  --success:    #00e5a0;
+  --rule:       #1e2550;
+  --font-head:  'Space Grotesk', system-ui, sans-serif;
+  --font-ui:    'Inter', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg:         #f4f6ff;
+  --bg-panel:   #ffffff;
+  --bg-panel2:  #eef0fc;
+  --bg-input:   #f8f9ff;
+  --fg:         #0f1a3d;
+  --fg-mid:     #3d4870;
+  --fg-dim:     #8090c0;
+  --accent:     #0066cc;
+  --accent2:    #5c35cc;
+  --accent3:    #007a50;
+  --warn:       #9a5a00;
+  --danger:     #c01040;
+  --success:    #007a50;
+  --rule:       #cdd4f0;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  min-height: 100vh;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--rule);
+  padding: 20px max(24px, env(safe-area-inset-left,0px));
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky; top: env(safe-area-inset-top,0); z-index: 100;
+}
+.hdr-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,var(--accent2),var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.hdr-text { flex: 1; min-width: 0; }
+.hdr-eyebrow { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); }
+.hdr-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; line-height: 1.1; }
+.hdr-btn {
+  background: var(--bg-panel2); border: 1px solid var(--rule);
+  color: var(--fg); padding: 7px 14px; border-radius: 8px;
+  font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  font-family: var(--font-ui); transition: background .15s;
+  white-space: nowrap;
+}
+.hdr-btn:hover { background: var(--rule); }
+.score-pill {
+  background: linear-gradient(90deg,var(--accent2),var(--accent));
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 0.75rem; font-weight: 700;
+  color: #fff; letter-spacing: 0.04em;
+  min-width: 70px; text-align: center;
+}
+
+/* ── MAIN ── */
+.page { max-width: 820px; margin: 0 auto; padding: 32px 24px 80px; }
+
+/* ── INTRO BANNER ── */
+.intro-banner {
+  background: linear-gradient(135deg,var(--bg-panel2),var(--bg-panel));
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.intro-banner-icon { font-size: 2rem; flex-shrink: 0; }
+.intro-banner h2 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin: 0 0 4px; }
+.intro-banner p { margin: 0; color: var(--fg-mid); font-size: 0.88rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tag {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 100px;
+  border: 1px solid;
+}
+.tag-blue  { color: var(--accent);  border-color: var(--accent);  background: rgba(0,207,255,.06); }
+.tag-purple{ color: var(--accent2); border-color: var(--accent2); background: rgba(123,92,255,.06); }
+.tag-green { color: var(--accent3); border-color: var(--accent3); background: rgba(0,255,153,.06); }
+.tag-warn  { color: var(--warn);    border-color: var(--warn);    background: rgba(255,179,0,.06); }
+
+/* ── EXERCISE CARD ── */
+.ex-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.ex-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-panel2);
+}
+.ex-num {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+  color: var(--accent); background: rgba(0,207,255,.08);
+  border: 1px solid rgba(0,207,255,.2);
+  padding: 3px 10px; border-radius: 100px; letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.ex-num.purple { color: var(--accent2); background: rgba(123,92,255,.08); border-color: rgba(123,92,255,.2); }
+.ex-num.green  { color: var(--accent3); background: rgba(0,255,153,.08); border-color: rgba(0,255,153,.2); }
+.ex-num.warn   { color: var(--warn);    background: rgba(255,179,0,.08);  border-color: rgba(255,179,0,.2); }
+.ex-title { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; flex: 1; }
+.ex-diff {
+  font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  background: var(--bg-input); color: var(--fg-dim); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ex-diff.easy   { color: var(--accent3); background: rgba(0,255,153,.06); }
+.ex-diff.medium { color: var(--warn);    background: rgba(255,179,0,.06); }
+.ex-diff.hard   { color: var(--danger);  background: rgba(255,79,107,.06); }
+
+.ex-body { padding: 20px 24px; }
+
+/* ── CONTEXT BOX ── */
+.ctx-box {
+  background: var(--bg-panel2); border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent2);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px; margin-bottom: 18px; font-size: 0.88rem;
+  color: var(--fg-mid); line-height: 1.65;
+}
+.ctx-box strong { color: var(--fg); }
+.ctx-label {
+  font-size: 0.63rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent2); margin-bottom: 6px;
+}
+
+/* ── QUESTION ── */
+.question { margin-bottom: 20px; }
+.q-label {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 8px;
+}
+.q-num {
+  font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+  color: var(--accent); min-width: 20px; flex-shrink: 0;
+}
+.q-text { font-size: 0.9rem; color: var(--fg); line-height: 1.55; }
+.q-text strong { color: var(--accent); }
+.q-text em { color: var(--warn); font-style: normal; font-weight: 600; }
+
+/* ── INPUT AREA ── */
+.answer-row {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.ans-input {
+  flex: 1; min-width: 120px;
+  background: var(--bg-input); border: 1.5px solid var(--rule);
+  border-radius: 8px; padding: 9px 12px;
+  font-family: var(--font-mono); font-size: 0.88rem;
+  color: var(--fg); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.ans-input:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(123,92,255,.12); }
+.ans-input.correct { border-color: var(--success); }
+.ans-input.wrong   { border-color: var(--danger); }
+
+/* ── TEXTAREA ── */
+.ans-textarea {
+  width: 100%;
+  background: var(--bg-input); border: 1.5px solid var(--rule);
+  border-radius: 8px; padding: 10px 12px;
+  font-family: var(--font-ui); font-size: 0.85rem;
+  color: var(--fg); outline: none; resize: vertical;
+  min-height: 72px; line-height: 1.55;
+  transition: border-color .15s;
+}
+.ans-textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(123,92,255,.12); }
+
+/* ── CHECK BTN ── */
+.check-btn {
+  background: linear-gradient(135deg,var(--accent2),var(--accent));
+  border: none; border-radius: 8px; padding: 9px 18px;
+  font-family: var(--font-ui); font-size: 0.8rem; font-weight: 700;
+  color: #fff; cursor: pointer; white-space: nowrap;
+  transition: opacity .15s, transform .1s;
+}
+.check-btn:hover { opacity: .9; }
+.check-btn:active { transform: scale(.97); }
+
+/* ── FEEDBACK ── */
+.feedback {
+  margin-top: 10px; padding: 12px 14px;
+  border-radius: 8px; font-size: 0.85rem; line-height: 1.6;
+  display: none;
+}
+.feedback.show { display: block; }
+.feedback.ok   { background: rgba(0,229,160,.08); border: 1px solid rgba(0,229,160,.2); color: var(--success); }
+.feedback.ko   { background: rgba(255,79,107,.08); border: 1px solid rgba(255,79,107,.2); color: var(--danger); }
+.feedback.info { background: rgba(0,207,255,.06); border: 1px solid rgba(0,207,255,.15); color: var(--accent); }
+.feedback-icon { font-size: 1rem; margin-right: 6px; }
+.feedback .corr { color: var(--success); font-family: var(--font-mono); font-weight: 600; }
+.feedback .detail { color: var(--fg-mid); margin-top: 4px; font-size: 0.82rem; }
+
+/* ── MULTI-CHOICE ── */
+.choices { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.choice-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-input); border: 1.5px solid var(--rule);
+  border-radius: 8px; padding: 10px 14px;
+  font-family: var(--font-ui); font-size: 0.88rem;
+  color: var(--fg); cursor: pointer; text-align: left;
+  transition: border-color .15s, background .15s;
+}
+.choice-btn:hover { border-color: var(--accent2); background: rgba(123,92,255,.06); }
+.choice-btn.selected { border-color: var(--accent2); background: rgba(123,92,255,.1); }
+.choice-btn.correct  { border-color: var(--success); background: rgba(0,229,160,.08); color: var(--success); }
+.choice-btn.wrong    { border-color: var(--danger);  background: rgba(255,79,107,.08); color: var(--danger); }
+.choice-letter {
+  font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+  min-width: 20px; color: var(--fg-dim);
+}
+.choice-btn.selected .choice-letter { color: var(--accent2); }
+.choice-btn.correct  .choice-letter { color: var(--success); }
+.choice-btn.wrong    .choice-letter { color: var(--danger); }
+
+/* ── CONVERSION TABLE ── */
+.conv-table {
+  width: 100%; border-collapse: collapse; font-family: var(--font-mono);
+  font-size: 0.82rem; margin: 10px 0;
+}
+.conv-table th {
+  background: var(--bg-panel2); color: var(--fg-mid);
+  padding: 7px 12px; text-align: left;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.conv-table td { padding: 7px 12px; border-bottom: 1px solid var(--rule); }
+.conv-table tr:last-child td { border-bottom: none; }
+
+/* ── SIGNAL CARDS ── */
+.signal-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 10px; margin: 10px 0;
+}
+.signal-card {
+  background: var(--bg-input); border: 1.5px solid var(--rule);
+  border-radius: 10px; padding: 12px 14px;
+}
+.signal-card-label { font-size: 0.72rem; font-weight: 600; color: var(--fg-dim); margin-bottom: 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+.signal-card-desc  { font-size: 0.85rem; color: var(--fg-mid); line-height: 1.4; margin-bottom: 10px; }
+.signal-select {
+  width: 100%; background: var(--bg-panel2); border: 1.5px solid var(--rule);
+  border-radius: 7px; padding: 7px 10px;
+  font-family: var(--font-ui); font-size: 0.82rem; color: var(--fg); outline: none;
+  cursor: pointer;
+}
+.signal-select:focus { border-color: var(--accent2); }
+.signal-select.correct { border-color: var(--success); }
+.signal-select.wrong   { border-color: var(--danger); }
+
+/* ── FORMULA BOX ── */
+.formula-box {
+  background: var(--bg-panel2); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 12px 16px; margin: 12px 0;
+  font-family: var(--font-mono); font-size: 0.88rem;
+  display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap;
+}
+.formula-label {
+  font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--warn);
+  flex-shrink: 0; margin-top: 2px;
+}
+.formula-content { color: var(--fg); line-height: 1.8; }
+.formula-content .sym { color: var(--accent); font-weight: 600; }
+.formula-content .val { color: var(--accent3); font-weight: 600; }
+
+/* ── CAPTEUR TABLE ── */
+.capteur-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+.capteur-table th {
+  background: var(--bg-panel2); color: var(--fg-mid);
+  padding: 9px 14px; text-align: left; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.capteur-table td { padding: 10px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.capteur-table tr:last-child td { border-bottom: none; }
+.cap-name { font-weight: 600; color: var(--fg); }
+.cap-desc { color: var(--fg-mid); font-size: 0.82rem; }
+
+/* ── STEPS HELPER ── */
+.steps {
+  background: var(--bg-input); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 12px 16px; margin: 10px 0;
+  display: none;
+}
+.steps.show { display: block; }
+.steps-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warn); margin-bottom: 8px; }
+.step { display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.84rem; color: var(--fg-mid); }
+.step-n { color: var(--warn); font-family: var(--font-mono); font-weight: 700; min-width: 16px; }
+
+/* ── HINT BUTTON ── */
+.hint-btn {
+  background: none; border: 1px solid var(--warn);
+  color: var(--warn); border-radius: 7px; padding: 5px 12px;
+  font-size: 0.72rem; font-weight: 600; cursor: pointer;
+  font-family: var(--font-ui); transition: background .15s;
+}
+.hint-btn:hover { background: rgba(255,179,0,.08); }
+
+/* ── PROGRESS ── */
+.progress-bar-wrap { height: 3px; background: var(--rule); margin-bottom: 28px; border-radius: 2px; overflow: hidden; }
+.progress-bar      { height: 100%; background: linear-gradient(90deg,var(--accent2),var(--accent)); border-radius: 2px; transition: width .4s ease; }
+
+/* ── PRINT ── */
+@media print {
+  header { position: static; }
+  .hdr-btn, .check-btn, .hint-btn { display: none; }
+  .choices, .signal-select { pointer-events: none; }
+  body { background: white; color: #111; }
+  .ex-card { border: 1px solid #ccc; page-break-inside: avoid; }
+}
+
+@media (max-width: 600px) {
+  .page { padding: 20px 14px 60px; }
+  header { padding: 14px 16px; }
+  .signal-cards { grid-template-columns: 1fr; }
+  .ex-body { padding: 16px 16px; }
+}
+
+p { margin: 0 0 8px; }
+strong { color: var(--fg); }
+ul { padding-left: 20px; color: var(--fg-mid); line-height: 1.8; margin: 8px 0; }
+code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-panel2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; color: var(--accent3); }
+sub, sup { font-size: 0.7em; }
+</style>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-icon">📐</div>
+  <div class="hdr-text">
+    <div class="hdr-eyebrow">Sciences de l'Ingénieur — 1ère Spé SI</div>
+    <div class="hdr-title">Transmission des données · Exercices</div>
+  </div>
+  <div class="score-pill" id="scoreDisplay">0 / 0</div>
+  <button class="hdr-btn" onclick="toggleTheme()">🌓</button>
+  <button class="hdr-btn" onclick="resetAll()">↺ Reset</button>
+</header>
+
+<div class="page">
+
+  <!-- PROGRESS -->
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+  <!-- INTRO -->
+  <div class="intro-banner">
+    <div class="intro-banner-icon">🔬</div>
+    <div>
+      <h2>6 exercices · Numération &amp; Types de signaux</h2>
+      <p>Ces exercices couvrent la conversion de bases, l'analyse de signaux et la chaîne de conversion analogique-numérique. Entre tes réponses, puis clique <strong>Vérifier</strong> pour obtenir la correction détaillée.</p>
+      <div class="tags">
+        <span class="tag tag-blue">Binaire · Hexa</span>
+        <span class="tag tag-purple">CAN · CNA</span>
+        <span class="tag tag-green">Capteurs</span>
+        <span class="tag tag-warn">Échantillonnage</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 1 — Conversions de bases
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num">Exercice 1</span>
+      <span class="ex-title">Conversions de bases — Modules IoT</span>
+      <span class="ex-diff medium">★★☆</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Plusieurs types de représentations (décimale, binaire, hexadécimale) sont utilisées dans des protocoles de communication pour des modules IoT. L'objectif est de maîtriser les conversions entre ces bases et de déterminer la capacité de représentation en fonction du nombre de bits.
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q1_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Convertir</strong> le nombre décimal <code>(4545)<sub>10</sub></code> en base binaire.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_1_in" placeholder="ex : 1010 1010 1010 1010" spellcheck="false">
+          <button class="hint-btn" onclick="toggleHint('h1_1')">💡 Aide</button>
+          <button class="check-btn" onclick="checkText('q1_1','q1_1_in','1000111000001','4545 ÷ 2 en divisions successives : 4545=4096+256+128+64+1 = 2¹²+2⁸+2⁷+2⁶+2⁰ = 1 0001 1100 0001₂','Rappel : diviser 4545 par 2 de manière successive et noter les restes (bit de poids faible en premier).')">Vérifier</button>
+        </div>
+        <div class="steps" id="h1_1">
+          <div class="steps-title">Méthode — Divisions successives par 2</div>
+          <div class="step"><span class="step-n">①</span> 4545 ÷ 2 = 2272 reste <strong>1</strong> (LSB)</div>
+          <div class="step"><span class="step-n">②</span> 2272 ÷ 2 = 1136 reste <strong>0</strong></div>
+          <div class="step"><span class="step-n">③</span> 1136 ÷ 2 = 568 reste <strong>0</strong></div>
+          <div class="step"><span class="step-n">④</span> … continuer jusqu'au quotient = 0</div>
+          <div class="step"><span class="step-n">⑤</span> Lire les restes de bas en haut → MSB en tête</div>
+        </div>
+        <div class="feedback" id="q1_1_fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q1_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Convertir</strong> le mot binaire <code>(11010110101)<sub>2</sub></code> en base décimale.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_2_in" placeholder="Résultat décimal…" style="max-width:160px;" type="number">
+          <button class="check-btn" onclick="checkNum('q1_2','q1_2_in',1717,'Calcul : 2¹⁰+2⁹+2⁷+2⁵+2⁴+2²+2⁰ = 1024+512+128+32+16+4+1 = 1717')">Vérifier</button>
+        </div>
+        <div class="feedback" id="q1_2_fb"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question" id="q1_3">
+        <div class="q-label"><span class="q-num">3.</span><span class="q-text"><strong>Convertir</strong> le nombre hexadécimal <code>(1F1F)<sub>16</sub></code> en base décimale.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_3_in" placeholder="Résultat décimal…" style="max-width:160px;" type="number">
+          <button class="hint-btn" onclick="toggleHint('h1_3')">💡 Aide</button>
+          <button class="check-btn" onclick="checkNum('q1_3','q1_3_in',7967,'1×16³ + 15×16² + 1×16 + 15 = 4096 + 3840 + 16 + 15 = 7967')">Vérifier</button>
+        </div>
+        <div class="steps" id="h1_3">
+          <div class="steps-title">Rappel de méthode</div>
+          <div class="step"><span class="step-n">①</span> Chaque chiffre hexa vaut : 0–9 → valeur directe, A=10, B=11, C=12, D=13, E=14, F=15</div>
+          <div class="step"><span class="step-n">②</span> Multiplier chaque chiffre par sa puissance de 16 (position de droite à gauche : 16⁰, 16¹, 16², 16³…)</div>
+          <div class="step"><span class="step-n">③</span> Additionner tous les termes</div>
+        </div>
+        <div class="feedback" id="q1_3_fb"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question" id="q1_4">
+        <div class="q-label"><span class="q-num">4.</span><span class="q-text"><strong>Convertir</strong> le mot binaire <code>(111001011100101)<sub>2</sub></code> en base hexadécimale.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_4_in" placeholder="ex : A3F2" spellcheck="false" style="max-width:200px;">
+          <button class="hint-btn" onclick="toggleHint('h1_4')">💡 Aide</button>
+          <button class="check-btn" onclick="checkText('q1_4','q1_4_in','72E5','Grouper par 4 bits depuis la droite : 0111 0010 1110 0101 → 7 2 E 5 → 72E5')">Vérifier</button>
+        </div>
+        <div class="steps" id="h1_4">
+          <div class="steps-title">Méthode — Groupes de 4 bits</div>
+          <div class="step"><span class="step-n">①</span> Partir de la droite, former des groupes de 4 bits</div>
+          <div class="step"><span class="step-n">②</span> Compléter le groupe de gauche avec des 0 si nécessaire</div>
+          <div class="step"><span class="step-n">③</span> Convertir chaque groupe de 4 bits en un chiffre hexa (0–F)</div>
+        </div>
+        <div class="feedback" id="q1_4_fb"></div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="question" id="q1_5">
+        <div class="q-label"><span class="q-num">5.</span><span class="q-text"><strong>Déterminer</strong> le nombre total de valeurs différentes représentables sur <em>8 bits</em>.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_5_in" placeholder="Valeur…" type="number" style="max-width:140px;">
+          <button class="check-btn" onclick="checkNum('q1_5','q1_5_in',256,'2⁸ = 256 valeurs différentes (de 0 à 255)')">Vérifier</button>
+        </div>
+        <div class="feedback" id="q1_5_fb"></div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="question" id="q1_6">
+        <div class="q-label"><span class="q-num">6.</span><span class="q-text"><strong>Déterminer</strong> la valeur décimale maximale représentable sur <em>12 bits</em>.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q1_6_in" placeholder="Valeur max…" type="number" style="max-width:140px;">
+          <button class="check-btn" onclick="checkNum('q1_6','q1_6_in',4095,'2¹² − 1 = 4096 − 1 = 4095')">Vérifier</button>
+        </div>
+        <div class="feedback" id="q1_6_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 2 — Types de signaux
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num purple">Exercice 2</span>
+      <span class="ex-title">Signaux analogiques, numériques et logiques</span>
+      <span class="ex-diff easy">★☆☆</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Dans un laboratoire, divers signaux (température, fréquence radio, état d'interrupteurs, etc.) sont mesurés ou transmis. Chaque type de signal nécessite un traitement adapté.
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q2_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Classer</strong> chaque signal dans la bonne catégorie (analogique / numérique / logique) :</span></div>
+        <div class="signal-cards">
+          <div class="signal-card">
+            <div class="signal-card-label">Signal A</div>
+            <div class="signal-card-desc">Température variant de manière <strong>continue</strong> entre 20 °C et 50 °C</div>
+            <select class="signal-select" id="sig_A" onchange="checkSignal(this,'analogique')">
+              <option value="">— choisir —</option>
+              <option value="analogique">Analogique</option>
+              <option value="numerique">Numérique</option>
+              <option value="logique">Logique</option>
+            </select>
+          </div>
+          <div class="signal-card">
+            <div class="signal-card-label">Signal B</div>
+            <div class="signal-card-desc">Lumière <strong>allumée ou éteinte</strong> via un interrupteur classique</div>
+            <select class="signal-select" id="sig_B" onchange="checkSignal(this,'logique')">
+              <option value="">— choisir —</option>
+              <option value="analogique">Analogique</option>
+              <option value="numerique">Numérique</option>
+              <option value="logique">Logique</option>
+            </select>
+          </div>
+          <div class="signal-card">
+            <div class="signal-card-label">Signal C</div>
+            <div class="signal-card-desc">Fréquence radio <strong>modulée</strong> pour transmettre de la voix</div>
+            <select class="signal-select" id="sig_C" onchange="checkSignal(this,'analogique')">
+              <option value="">— choisir —</option>
+              <option value="analogique">Analogique</option>
+              <option value="numerique">Numérique</option>
+              <option value="logique">Logique</option>
+            </select>
+          </div>
+        </div>
+        <div class="feedback info show" style="margin-top:8px;font-size:0.82rem;">
+          <span class="feedback-icon">ℹ️</span>
+          <strong>Rappel :</strong> Analogique = valeur continue · Numérique = valeurs discrètes codées en binaire · Logique = seulement 2 états (0 / 1)
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q2_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Énoncer</strong> deux différences principales entre un signal analogique et un signal numérique.</span></div>
+        <textarea class="ans-textarea" id="q2_2_in" placeholder="Différence 1 : …&#10;Différence 2 : …"></textarea>
+        <div style="margin-top:8px;">
+          <button class="check-btn" onclick="showModelAnswer('q2_2','Différence 1 : Un signal analogique peut prendre une infinité de valeurs continues, tandis qu\'un signal numérique ne peut prendre qu\'un nombre fini de valeurs discrètes.\nDifférence 2 : Le signal numérique est moins sensible au bruit (perturbations) car seuls les niveaux 0 et 1 sont reconnus, contrairement au signal analogique qui amplifie les perturbations.')">Voir la correction</button>
+        </div>
+        <div class="feedback" id="q2_2_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 3 — Capteurs en ligne d'assemblage
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num green">Exercice 3</span>
+      <span class="ex-title">Capteurs — Ligne d'assemblage automobile</span>
+      <span class="ex-diff medium">★★☆</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Trois capteurs différents sont installés pour contrôler la qualité d'une ligne d'assemblage automobile :
+        <ul style="margin-top:8px;">
+          <li><strong>Capteur A</strong> — Interrupteur de fin de course (présence/absence d'un composant)</li>
+          <li><strong>Capteur B</strong> — Capteur de force d'un vérin : sortie 0 V à 5 V pour 0 N à 100 N</li>
+          <li><strong>Capteur C</strong> — Capteur de température numérique via bus I²C</li>
+        </ul>
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q3_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Indiquer</strong> le type de chaque capteur (logique / analogique / numérique) et justifier.</span></div>
+        <table class="capteur-table">
+          <thead><tr><th>Capteur</th><th>Type</th><th>Justification</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="cap-name">A — Fin de course</span></td>
+              <td><select class="signal-select" id="cap_A" onchange="checkSignal(this,'logique')" style="width:130px;">
+                <option value="">—</option>
+                <option value="logique">Logique</option>
+                <option value="analogique">Analogique</option>
+                <option value="numerique">Numérique</option>
+              </select></td>
+              <td><input class="ans-input" id="cap_A_j" placeholder="Justification…" style="width:100%;"></td>
+            </tr>
+            <tr>
+              <td><span class="cap-name">B — Force vérin</span></td>
+              <td><select class="signal-select" id="cap_B" onchange="checkSignal(this,'analogique')" style="width:130px;">
+                <option value="">—</option>
+                <option value="logique">Logique</option>
+                <option value="analogique">Analogique</option>
+                <option value="numerique">Numérique</option>
+              </select></td>
+              <td><input class="ans-input" id="cap_B_j" placeholder="Justification…" style="width:100%;"></td>
+            </tr>
+            <tr>
+              <td><span class="cap-name">C — Température I²C</span></td>
+              <td><select class="signal-select" id="cap_C" onchange="checkSignal(this,'numerique')" style="width:130px;">
+                <option value="">—</option>
+                <option value="logique">Logique</option>
+                <option value="analogique">Analogique</option>
+                <option value="numerique">Numérique</option>
+              </select></td>
+              <td><input class="ans-input" id="cap_C_j" placeholder="Justification…" style="width:100%;"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="check-btn" style="margin-top:10px;" onclick="showModelAnswer('q3_1','A = Logique : seulement 2 états possibles (composant présent → 1, absent → 0).\nB = Analogique : la tension de sortie varie de façon continue de 0 V à 5 V selon la force appliquée (0–100 N).\nC = Numérique : la valeur de température est transmise sous forme de données binaires via le protocole I²C.')">Voir la correction</button>
+        <div class="feedback" id="q3_1_fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q3_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Déterminer</strong> la tension de sortie du capteur B pour une force de <em>60 N</em>.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">U</span> = U<sub>max</sub> × <span class="sym">F</span> / F<sub>max</sub> = <span class="val">5 V</span> × F / <span class="val">100 N</span></span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q3_2_in" placeholder="Tension en V…" type="number" step="0.1" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">V</span>
+          <button class="check-btn" onclick="checkNum('q3_2','q3_2_in',3,'U = 5 × 60/100 = 3,0 V',0.05)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q3_2_fb"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question" id="q3_3">
+        <div class="q-label"><span class="q-num">3.</span><span class="q-text"><strong>Expliquer</strong> brièvement pourquoi cette mesure est importante dans la ligne d'assemblage.</span></div>
+        <textarea class="ans-textarea" id="q3_3_in" placeholder="Ton explication…"></textarea>
+        <button class="check-btn" style="margin-top:8px;" onclick="showModelAnswer('q3_3','Mesurer la force du vérin permet de vérifier que le serrage ou l\'assemblage est effectué avec la force correcte. Une force trop faible indiquerait un assemblage insuffisant (risque de défaut), une force trop élevée pourrait endommager les pièces. Cela assure le contrôle qualité et le bon réglage du vérin.')">Voir la correction</button>
+        <div class="feedback" id="q3_3_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 4 — CAN dispositif médical
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num warn">Exercice 4</span>
+      <span class="ex-title">CAN — Dispositif médical portable</span>
+      <span class="ex-diff hard">★★★</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Dans un dispositif médical portable, la pression sanguine est convertie en tension analogique, puis numérisée. <br>
+        <strong>CAN :</strong> 12 bits · Tension de référence V<sub>ref</sub> = 3 V · Fréquence d'échantillonnage f<sub>e</sub> = 2 kHz.
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q4_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Calculer</strong> le quantum (résolution) de ce CAN.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">q</span> = V<sub>ref</sub> / 2<sup>n</sup> = <span class="val">3</span> / 2<sup>12</sup></span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q4_1_in" placeholder="Valeur en mV…" type="number" step="0.001" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">mV</span>
+          <button class="check-btn" onclick="checkNum('q4_1','q4_1_in',0.7324,'q = 3/4096 ≈ 7,324×10⁻⁴ V ≈ 0,732 mV',0.1)">Vérifier</button>
+        </div>
+        <div class="feedback info show" style="margin-top:6px;font-size:0.8rem;">
+          <span class="feedback-icon">💡</span>Exprimer en mV : 3000 mV / 4096 ≈ <strong>0,732 mV</strong>
+        </div>
+        <div class="feedback" id="q4_1_fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q4_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Indiquer</strong> la valeur numérique (entier) retournée par ce CAN pour une tension d'entrée de <em>2,25 V</em>.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">N</span> = E(V<sub>in</sub> / q) = E(<span class="val">2,25</span> / (3/4096))</span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q4_2_in" placeholder="Valeur entière…" type="number" style="max-width:160px;">
+          <button class="check-btn" onclick="checkNum('q4_2','q4_2_in',3072,'N = E(2,25 × 4096 / 3) = E(3072) = 3072. Vérification : 2,25/3 = 0,75 = 3/4 → 3/4 × 4096 = 3072',1)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q4_2_fb"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question" id="q4_3">
+        <div class="q-label"><span class="q-num">3.</span><span class="q-text"><strong>Calculer</strong> la période d'échantillonnage pour f<sub>e</sub> = 2 kHz.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">T<sub>e</sub></span> = 1 / <span class="sym">f<sub>e</sub></span></span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q4_3_in" placeholder="Valeur en µs…" type="number" step="1" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">µs</span>
+          <button class="check-btn" onclick="checkNum('q4_3','q4_3_in',500,'T = 1/2000 = 5×10⁻⁴ s = 500 µs',5)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q4_3_fb"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="question" id="q4_4">
+        <div class="q-label"><span class="q-num">4.</span><span class="q-text"><strong>Expliquer</strong> pourquoi une fréquence d'échantillonnage plus élevée améliore la précision du signal converti.</span></div>
+        <textarea class="ans-textarea" id="q4_4_in" placeholder="Ton explication…"></textarea>
+        <button class="check-btn" style="margin-top:8px;" onclick="showModelAnswer('q4_4','Plus la fréquence d\'échantillonnage est élevée, plus on prend de mesures par seconde. Cela permet de mieux « suivre » les variations rapides du signal analogique original. Selon le théorème de Shannon-Nyquist, il faut au minimum f_e ≥ 2 × f_max pour reconstruire fidèlement le signal. Une fréquence plus élevée réduit les pertes d\'information entre deux échantillons consécutifs.')">Voir la correction</button>
+        <div class="feedback" id="q4_4_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 5 — CNA actionneur
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num">Exercice 5</span>
+      <span class="ex-title">CNA — Commande d'actionneur</span>
+      <span class="ex-diff medium">★★☆</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Certains actionneurs (moteurs, vannes, etc.) nécessitent une commande analogique : un <strong>CNA</strong> génère une tension à partir d'une valeur numérique issue du microcontrôleur.<br>
+        <strong>CNA :</strong> 10 bits · V<sub>ref</sub> = 5 V · Valeur numérique N = (512)<sub>10</sub>
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q5_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Calculer</strong> le quantum de ce CNA.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">q</span> = V<sub>ref</sub> / 2<sup>n</sup> = <span class="val">5</span> / 2<sup>10</sup> = 5 / 1024</span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q5_1_in" placeholder="Valeur en mV…" type="number" step="0.01" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">mV</span>
+          <button class="check-btn" onclick="checkNum('q5_1','q5_1_in',4.883,'q = 5000/1024 ≈ 4,883 mV',0.1)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q5_1_fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q5_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Déterminer</strong> la tension analogique de sortie pour N = (512)<sub>10</sub>.</span></div>
+        <div class="formula-box">
+          <span class="formula-label">Formule</span>
+          <span class="formula-content"><span class="sym">V<sub>out</sub></span> = N × q = <span class="val">512</span> × (5/1024)</span>
+        </div>
+        <div class="answer-row">
+          <input class="ans-input" id="q5_2_in" placeholder="Tension en V…" type="number" step="0.01" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">V</span>
+          <button class="check-btn" onclick="checkNum('q5_2','q5_2_in',2.5,'V = 512 × 5/1024 = 2560/1024 = 2,5 V (soit exactement la moitié de Vref, cohérent car 512 = 2^10/2)',0.05)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q5_2_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EXERCICE 6 — Chaîne CAN + CNA
+  ════════════════════════════════════════════════ -->
+  <div class="ex-card">
+    <div class="ex-head">
+      <span class="ex-num purple">Exercice 6</span>
+      <span class="ex-title">Chaîne complète CAN → CNA — Laboratoire pharmaceutique</span>
+      <span class="ex-diff hard">★★★</span>
+    </div>
+    <div class="ex-body">
+      <div class="ctx-box">
+        <div class="ctx-label">Contexte</div>
+        Un capteur analogique mesure la température. Un <strong>CAN de 10 bits</strong> (V<sub>ref</sub> = 5 V) numérise la mesure, puis un <strong>CNA de 10 bits</strong> (V<sub>ref</sub> = 5 V) restitue un signal analogique pour un instrument d'enregistrement.
+      </div>
+
+      <!-- Q1 -->
+      <div class="question" id="q6_1">
+        <div class="q-label"><span class="q-num">1.</span><span class="q-text"><strong>Calculer</strong> la résolution (quantum) du CAN.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q6_1_in" placeholder="Valeur en mV…" type="number" step="0.01" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">mV</span>
+          <button class="check-btn" onclick="checkNum('q6_1','q6_1_in',4.883,'q = 5000/1024 ≈ 4,883 mV (identique à l\'exercice 5 : même CAN)',0.1)">Vérifier</button>
+        </div>
+        <div class="feedback" id="q6_1_fb"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="question" id="q6_2">
+        <div class="q-label"><span class="q-num">2.</span><span class="q-text"><strong>Déterminer</strong> la valeur numérique N retournée par le CAN pour une tension mesurée de <em>3,2 V</em>.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q6_2_in" placeholder="Valeur entière…" type="number" style="max-width:160px;">
+          <button class="hint-btn" onclick="toggleHint('h6_2')">💡 Aide</button>
+          <button class="check-btn" onclick="checkNum('q6_2','q6_2_in',655,'N = E(3,2 × 1024/5) = E(655,36) = 655',1)">Vérifier</button>
+        </div>
+        <div class="steps" id="h6_2">
+          <div class="steps-title">Méthode</div>
+          <div class="step"><span class="step-n">①</span> N = E(V<sub>in</sub> / q) = E(V<sub>in</sub> × 2ⁿ / V<sub>ref</sub>)</div>
+          <div class="step"><span class="step-n">②</span> N = E(3,2 × 1024 / 5) = E(655,36)</div>
+          <div class="step"><span class="step-n">③</span> On prend la partie entière → N = <strong>655</strong></div>
+        </div>
+        <div class="feedback" id="q6_2_fb"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="question" id="q6_3">
+        <div class="q-label"><span class="q-num">3.</span><span class="q-text"><strong>Indiquer</strong> la tension analogique restituée par le CNA (10 bits, 5 V) pour N = 655. <em>Préciser</em> s'il peut exister un écart.</span></div>
+        <div class="answer-row">
+          <input class="ans-input" id="q6_3_in" placeholder="Tension en V…" type="number" step="0.001" style="max-width:160px;">
+          <span style="color:var(--fg-mid);font-size:0.85rem;">V</span>
+          <button class="check-btn" onclick="checkNum('q6_3','q6_3_in',3.198,'V_out = 655 × 5/1024 = 3277,5/1024 ≈ 3,198 V. Écart = 3,2 − 3,198 ≈ 2 mV (erreur de quantification due à la partie décimale tronquée lors de la conversion CAN)',0.01)">Vérifier</button>
+        </div>
+        <div class="feedback info show" style="margin-top:6px;font-size:0.8rem;">
+          <span class="feedback-icon">💡</span>Pense à expliquer l'<strong>erreur de quantification</strong> : la tension restituée n'est pas exactement 3,2 V car on a tronqué 655,36 → 655.
+        </div>
+        <div class="feedback" id="q6_3_fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILAN -->
+  <div id="bilanCard" style="display:none; background:var(--bg-panel); border:1px solid var(--rule); border-radius:14px; padding:28px 24px; text-align:center; margin-top:8px;">
+    <div style="font-size:2.5rem; margin-bottom:12px;" id="bilanEmoji">🎉</div>
+    <div style="font-family:var(--font-head); font-size:1.4rem; font-weight:700; margin-bottom:6px;" id="bilanTitle">Bilan</div>
+    <div style="color:var(--fg-mid); font-size:0.9rem; margin-bottom:20px;" id="bilanMsg"></div>
+    <button class="check-btn" onclick="resetAll()">↺ Recommencer</button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// Theme
+function toggleTheme() {
+  const r = document.documentElement;
+  r.setAttribute('data-theme', r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+document.documentElement.setAttribute('data-theme', 'dark');
+
+// Score tracking
+let total = 0, correct = 0;
+
+function updateScore(isNew, isCorrect) {
+  if (isNew) {
+    total++;
+    if (isCorrect) correct++;
+  }
+  document.getElementById('scoreDisplay').textContent = correct + ' / ' + total;
+  document.getElementById('progressBar').style.width = (total > 0 ? Math.round((correct/total)*100) : 0) + '%';
+  if (total >= 14) showBilan();
+}
+
+function showBilan() {
+  const pct = total > 0 ? correct/total : 0;
+  const card = document.getElementById('bilanCard');
+  card.style.display = 'block';
+  document.getElementById('bilanEmoji').textContent = pct >= .8 ? '🏆' : pct >= .5 ? '👍' : '📚';
+  document.getElementById('bilanTitle').textContent = pct >= .8 ? 'Excellent travail !' : pct >= .5 ? 'Bien joué !' : 'Continue à réviser !';
+  document.getElementById('bilanMsg').textContent = correct + ' bonnes réponses sur ' + total + ' (' + Math.round(pct*100) + '%). ' + (pct < .8 ? 'Revois les notions marquées en rouge.' : 'Toutes les notions sont bien maîtrisées.');
+}
+
+// Generic feedback
+function fb(id, type, msg) {
+  const el = document.getElementById(id + '_fb');
+  if (!el) return;
+  el.className = 'feedback show ' + type;
+  el.innerHTML = (type === 'ok' ? '<span class="feedback-icon">✅</span>' : type === 'ko' ? '<span class="feedback-icon">❌</span>' : '<span class="feedback-icon">ℹ️</span>') + msg;
+}
+
+// Check text (normalize spaces, case, diacritics)
+function normalize(s) {
+  return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[àâä]/g,'a').replace(/[éèêë]/g,'e').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o');
+}
+
+function checkText(qid, inId, expected, correction, hint) {
+  const inp = document.getElementById(inId);
+  const val = normalize(inp.value);
+  const exp = normalize(expected);
+  // Accept if val contains all digits of expected (without spaces) or matches
+  const expNoSpace = exp.replace(/\s/g,'');
+  const valNoSpace = val.replace(/\s/g,'');
+  const isOk = valNoSpace === expNoSpace || val === exp;
+  inp.className = 'ans-input ' + (isOk ? 'correct' : 'wrong');
+  if (isOk) {
+    fb(qid, 'ok', '<strong>Correct !</strong> <span class="corr">' + expected.toUpperCase() + '</span>');
+  } else {
+    fb(qid, 'ko', '<strong>Pas tout à fait.</strong> Réponse attendue : <span class="corr">' + expected.toUpperCase() + '</span><div class="detail">' + correction + '</div>');
+  }
+  updateScore(true, isOk);
+}
+
+function checkNum(qid, inId, expected, correction, tolerance) {
+  const inp = document.getElementById(inId);
+  const val = parseFloat(inp.value);
+  const tol = tolerance || 0.01;
+  const isOk = !isNaN(val) && Math.abs(val - expected) <= tol;
+  inp.className = 'ans-input ' + (isOk ? 'correct' : 'wrong');
+  if (isOk) {
+    fb(qid, 'ok', '<strong>Correct !</strong> <span class="corr">' + expected + '</span>');
+  } else {
+    fb(qid, 'ko', '<strong>Pas tout à fait.</strong> Réponse attendue : <span class="corr">' + expected + '</span><div class="detail">' + correction + '</div>');
+  }
+  updateScore(true, isOk);
+}
+
+function showModelAnswer(qid, text) {
+  const escaped = text.replace(/\n/g,'<br>');
+  fb(qid, 'info', '<strong>Réponse modèle :</strong><br>' + escaped);
+  updateScore(true, true);
+}
+
+function checkSignal(sel, expected) {
+  const isOk = sel.value === expected;
+  sel.className = 'signal-select ' + (isOk ? 'correct' : (sel.value ? 'wrong' : ''));
+  // No score update for inline selects (they're part of question blocks)
+}
+
+// Hint toggle
+function toggleHint(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+// Reset
+function resetAll() {
+  document.querySelectorAll('.ans-input, .ans-textarea').forEach(el => { el.value = ''; el.className = el.tagName === 'TEXTAREA' ? 'ans-textarea' : 'ans-input'; });
+  document.querySelectorAll('.signal-select').forEach(el => { el.value = ''; el.className = 'signal-select'; });
+  document.querySelectorAll('.feedback:not(.info)').forEach(el => { el.className = 'feedback'; });
+  document.querySelectorAll('.steps').forEach(el => el.classList.remove('show'));
+  document.getElementById('bilanCard').style.display = 'none';
+  total = 0; correct = 0;
+  updateScore(false, false);
+}
+</script>
+
+</body></html>
